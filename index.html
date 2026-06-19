@@ -122,6 +122,10 @@
   thead th[data-key="owned"], tbody td.col-owned{ white-space:nowrap; text-align:center; width:1%; }
   .own-chk{ width:18px; height:18px; cursor:pointer; accent-color:var(--accent); vertical-align:middle; margin:0; }
   .owned-count{ color:var(--accent2); font-weight:700; }
+  .mini-btn{ font:inherit; font-size:12px; font-weight:700; cursor:pointer; padding:3px 9px;
+    border-radius:6px; border:1px solid var(--border); background:var(--panel2); color:var(--text);
+    margin-left:6px; vertical-align:middle; }
+  .mini-btn:hover{ border-color:var(--accent); background:var(--rowHover); }
   tbody tr:nth-child(even){background:var(--rowAlt);}
   tbody tr:nth-child(odd){background:var(--row);}
   tbody tr:hover{background:var(--rowHover);}
@@ -222,6 +226,8 @@
 <div class="meta-line">
   <span id="metaCount"></span>
   <span id="ownedCount" class="owned-count"></span>
+  <button class="mini-btn" id="markAllBtn">✔ Spunta visibili</button>
+  <button class="mini-btn" id="unmarkAllBtn">✖ Togli visibili</button>
   <span id="activeFilter"></span>
   <span id="metaInfo"></span>
 </div>
@@ -1574,7 +1580,7 @@ const I18N = {
     allMakes:'★ Tutte le marche', allTypes:'★ Tutti i tipi', allClasses:'★ Tutte le classi', allCountries:'★ Tutte le nazioni', allYears:'★ Tutti gli anni',
     fMake:'Marca', fType:'Tipo', fClass:'Classe', fCountry:'Nazione', fYear:'Anno', fInCol:'Ricerca in colonna', fSearch:'Ricerca',
     cols:{owned:'Possesso',make:'Marca',name:'Nome',year:'Anno',type:'Tipo',cls:'Classe',country:'Nazione',collection:'Collezione',dlc:'DLC',price:'Prezzo',priceDisc:'Prezzo Scontato'},
-    ownedLbl:'Possedute',
+    ownedLbl:'Possedute', markAll:'✔ Spunta visibili', unmarkAll:'✖ Togli visibili',
     coll:{'collection journal':'Collezione Giornaliera','autoshow':'Autosalone','wheelspin':'Ruota della Fortuna','seasonal':'Stagionale'},
     types:{'Buggies':'Buggy','Classic Muscle':'Muscle Classiche','Classic Racers':'Auto Da Corsa Classiche','Classic Rally':'Rally Classico','Classic Sports Cars':'Auto Sportive Classiche','Cult Cars':'Auto Di Culto','Drift Cars':'Auto Da Derapata','Eclectic Domestics':'Domestiche Eclettiche','Extreme Track Toys':'Giocattoli Da Gara Estremi','GT Cars':'Auto GT','Hot Hatch':'Hot Hatch','Hypercars':'Hypercar','Modern Muscle':'Muscle Moderne','Modern Rally':'Rally Moderne','Modern Sports Cars':'Auto Sportive Moderne','Modern Super Saloons':'Super Berline Moderne','Modern Supercars':'Supercar Moderne','Offroad':'Fuoristrada',"Pickups & 4x4's":'Pickup e 4x4','Rally Monsters':'Mostri Del Rally','Rare Classics':'Classiche Rare','Retro Hot Hatch':'Hot Hatch Rétro','Retro Muscle':'Muscle Rétro','Retro Racers':'Auto da Corsa Rètro','Retro Rally':'Rally Rétro','Retro Sports Cars':'Auto Sportive Rétro','Retro Super Saloons':'Super Berline Rétro','Retro Supercars':'Supercar Rétro','Rods and Customs':'HotRod e Personalizzate','Sports Utility Heroes':'Sports Utility Heroes','Super GT':'Super GT','Super Hot Hatch':'Super Hot Hatch','Track Toys':'Giocattoli Da Gara',"UTV's":'UTV','Unlimited Buggies':'Buggy Unlimited','Unlimited Offroad':'Fuoristrada Unlimited','Utility Heroes':'Veicoli Commerciali'}
   },
@@ -1595,7 +1601,7 @@ const I18N = {
     allMakes:'★ All makes', allTypes:'★ All types', allClasses:'★ All classes', allCountries:'★ All countries', allYears:'★ All years',
     fMake:'Make', fType:'Type', fClass:'Class', fCountry:'Country', fYear:'Year', fInCol:'Searching column', fSearch:'Search',
     cols:{owned:'Owned',make:'Make',name:'Name',year:'Year',type:'Type',cls:'Class',country:'Country',collection:'Collection',dlc:'DLC',price:'Price',priceDisc:'Discounted Price'},
-    ownedLbl:'Owned',
+    ownedLbl:'Owned', markAll:'✔ Check shown', unmarkAll:'✖ Uncheck shown',
     coll:{}, types:{}
   }
 };
@@ -1757,6 +1763,7 @@ function compare(a, b){
 
 function fmt(n){ return n==null ? '' : Number(n).toLocaleString('it-IT'); }
 
+let lastRows = [];
 function render(){
   let rows = cars.slice();
   if(state.brand) rows = rows.filter(c => c.make === state.brand);
@@ -1774,6 +1781,7 @@ function render(){
     }
   }
   rows.sort(compare);
+  lastRows = rows;   // righe attualmente visibili (per "Spunta/Togli visibili")
 
   // intestazioni: indicatore sort + colonna evidenziata da ricerca
   document.querySelectorAll('#headRow th').forEach(th => {
@@ -1870,6 +1878,16 @@ tbody.addEventListener('change', e => {
   saveOwned();
   updateOwnedCount();
 });
+
+// "Spunta/Togli tutte le visibili": agisce sulle auto attualmente filtrate
+function bulkOwn(value){
+  if(!lastRows.length) return;
+  lastRows.forEach(c => { if(value) owned.add(c.pid); else owned.delete(c.pid); });
+  saveOwned();
+  render();
+}
+document.getElementById('markAllBtn').addEventListener('click', () => bulkOwn(true));
+document.getElementById('unmarkAllBtn').addEventListener('click', () => bulkOwn(false));
 
 // ricerca
 const searchEl = document.getElementById('search');
@@ -1985,6 +2003,8 @@ function applyLang(l){
   document.getElementById('countryBtn').textContent = T.countryBtn;
   document.getElementById('yearBtn').textContent = T.yearBtn;
   document.getElementById('resetBtn').textContent = T.reset;
+  document.getElementById('markAllBtn').textContent = T.markAll;
+  document.getElementById('unmarkAllBtn').textContent = T.unmarkAll;
   document.getElementById('metaInfo').textContent = T.info;
   emptyMsg.textContent = T.empty;
   document.getElementById('popupTitle').textContent = T.popupTitle;

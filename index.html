@@ -174,7 +174,10 @@
   }
   .brand-item:hover{background:var(--rowHover); border-color:var(--accent);}
   .brand-item .cnt{color:var(--muted); font-size:11px; margin-left:5px;}
-  .brand-item.all{font-weight:800; color:var(--accent2);}
+  .brand-item.all{font-weight:800; color:var(--accent2);
+    column-span:all; -webkit-column-span:all;
+    margin-bottom:10px; border:1px solid var(--accent);}
+  .brand-item.all:hover{ background:var(--rowHover); border-color:var(--accent); }
   .empty{padding:30px; text-align:center; color:var(--muted);}
   @media (max-width:600px){
     h1{font-size:22px;}
@@ -202,10 +205,10 @@
     <span class="search-clear" id="searchClear" title="Azzera ricerca">&times;</span>
   </div>
   <button class="btn" id="brandBtn">Cerca per Marca ▾</button>
+  <button class="btn" id="yearBtn">Cerca per Anno ▾</button>
   <button class="btn" id="typeBtn">Cerca per Tipo ▾</button>
   <button class="btn" id="classBtn">Cerca per Classe ▾</button>
   <button class="btn" id="countryBtn">Cerca per Nazione ▾</button>
-  <button class="btn" id="yearBtn">Cerca per Anno ▾</button>
   <button class="btn secondary" id="resetBtn">Azzera filtri</button>
 </div>
 

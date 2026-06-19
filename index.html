@@ -1564,7 +1564,7 @@ const COLS = ['owned','make','name','year','type','cls','country','collection','
 /* ===================== LINGUE (i18n) ===================== */
 const I18N = {
   it: {
-    titleSub:'Lista Auto', updated:'Aggiornato',
+    titleSub:'Lista Auto', updated:'Aggiornato', dateStr:'19 Maggio 2026',
     searchPh:'Cerca auto, marca, tipo, classe, nazione, collezione, DLC…',
     brandBtn:'Cerca per Marca ▾', reset:'Azzera filtri',
     themeLight:'☀ Tema chiaro', themeDark:'🌙 Tema scuro',
@@ -1585,7 +1585,7 @@ const I18N = {
     types:{'Buggies':'Buggy','Classic Muscle':'Muscle Classiche','Classic Racers':'Auto Da Corsa Classiche','Classic Rally':'Rally Classico','Classic Sports Cars':'Auto Sportive Classiche','Cult Cars':'Auto Di Culto','Drift Cars':'Auto Da Derapata','Eclectic Domestics':'Domestiche Eclettiche','Extreme Track Toys':'Giocattoli Da Gara Estremi','GT Cars':'Auto GT','Hot Hatch':'Hot Hatch','Hypercars':'Hypercar','Modern Muscle':'Muscle Moderne','Modern Rally':'Rally Moderne','Modern Sports Cars':'Auto Sportive Moderne','Modern Super Saloons':'Super Berline Moderne','Modern Supercars':'Supercar Moderne','Offroad':'Fuoristrada',"Pickups & 4x4's":'Pickup e 4x4','Rally Monsters':'Mostri Del Rally','Rare Classics':'Classiche Rare','Retro Hot Hatch':'Hot Hatch Rétro','Retro Muscle':'Muscle Rétro','Retro Racers':'Auto da Corsa Rètro','Retro Rally':'Rally Rétro','Retro Sports Cars':'Auto Sportive Rétro','Retro Super Saloons':'Super Berline Rétro','Retro Supercars':'Supercar Rétro','Rods and Customs':'HotRod e Personalizzate','Sports Utility Heroes':'Sports Utility Heroes','Super GT':'Super GT','Super Hot Hatch':'Super Hot Hatch','Track Toys':'Giocattoli Da Gara',"UTV's":'UTV','Unlimited Buggies':'Buggy Unlimited','Unlimited Offroad':'Fuoristrada Unlimited','Utility Heroes':'Veicoli Commerciali'}
   },
   en: {
-    titleSub:'Car List', updated:'Updated',
+    titleSub:'Car List', updated:'Updated', dateStr:'19 May 2026',
     searchPh:'Search car, make, type, class, country, collection, DLC…',
     brandBtn:'Search by Make ▾', reset:'Reset filters',
     themeLight:'☀ Light theme', themeDark:'🌙 Dark theme',
@@ -2006,7 +2006,7 @@ function applyLang(l){
   lang = l; localStorage.setItem('fh6_lang', l);
   const T = I18N[l];
   document.getElementById('titleSub').textContent = T.titleSub;
-  document.getElementById('updatedTxt').textContent = T.updated + ' 19 May 2026';
+  document.getElementById('updatedTxt').textContent = T.updated + ' ' + T.dateStr;
   searchEl.placeholder = T.searchPh;
   document.getElementById('brandBtn').textContent = T.brandBtn;
   document.getElementById('typeBtn').textContent = T.typeBtn;

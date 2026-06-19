@@ -1,0 +1,1899 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forza Horizon 6 Lista Auto</title>
+<style>
+  :root{
+    --bg:#0e1116; --panel:#161b22; --panel2:#1c232d; --border:#2a3340;
+    --text:#f2f5f8; --muted:#9aa7b4; --accent:#e10600; --accent2:#ff8a00;
+    --row:#12171e; --rowAlt:#161c24; --rowHover:#202a36; --head:#11161c;
+    --inputBg:#0c1014; --highlight:#3a2a00; --badge:#222c38;
+  }
+  html[data-theme="light"]{
+    --bg:#f4f6f9; --panel:#ffffff; --panel2:#eef1f5; --border:#d4dae2;
+    --text:#10141a; --muted:#5a6675; --accent:#e10600; --accent2:#c25e00;
+    --row:#ffffff; --rowAlt:#f3f5f8; --rowHover:#e6ecf3; --head:#e9edf2;
+    --inputBg:#ffffff; --highlight:#fff2cc; --badge:#e7ecf2;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:"Segoe UI",Roboto,Helvetica,Arial,sans-serif; font-size:14px;
+  }
+  header.top{
+    padding:22px 20px 12px; text-align:center; position:relative;
+    border-bottom:1px solid var(--border); background:var(--panel);
+  }
+  h1{
+    margin:0; font-size:30px; letter-spacing:.5px; font-weight:800;
+    text-transform:uppercase;
+  }
+  h1 .accent{color:var(--accent);}
+  .updated{color:var(--muted); margin-top:6px; font-size:13px;}
+  .top-right{ position:absolute; right:16px; top:16px; display:flex; gap:8px; align-items:flex-start; z-index:40; }
+  .theme-toggle{
+    cursor:pointer; background:var(--panel2); color:var(--text); border:1px solid var(--border);
+    border-radius:20px; padding:7px 14px; font-size:13px; white-space:nowrap;
+  }
+  .theme-toggle:hover{border-color:var(--accent);}
+  .lang-dd{ position:relative; }
+  .lang-menu{
+    position:absolute; right:0; top:calc(100% + 4px); min-width:84px;
+    background:var(--panel2); border:1px solid var(--border); border-radius:10px;
+    overflow:hidden; display:none;
+  }
+  .lang-menu.open{ display:block; }
+  .lang-opt{ padding:8px 14px; cursor:pointer; font-size:13px; white-space:nowrap; }
+  .lang-opt:hover{ background:var(--rowHover); }
+  .flag{ width:20px; height:14px; vertical-align:-2px; border-radius:2px; margin-right:3px; box-shadow:0 0 0 1px rgba(0,0,0,.25); }
+
+  .controls{
+    max-width:1500px; margin:16px auto 0; padding:0 16px;
+    display:flex; gap:12px; flex-wrap:wrap; align-items:center; justify-content:center;
+  }
+  .search-wrap{position:relative; flex:1 1 420px; max-width:640px;}
+  #search{
+    width:100%; padding:12px 40px 12px 40px; font-size:15px;
+    background:var(--inputBg); color:var(--text);
+    border:1px solid var(--border); border-radius:10px; outline:none;
+  }
+  #search:focus{border-color:var(--accent);}
+  .search-wrap .ico{
+    position:absolute; left:13px; top:50%; transform:translateY(-50%);
+    color:var(--muted); font-size:16px;
+  }
+  .search-clear{
+    position:absolute; right:10px; top:50%; transform:translateY(-50%);
+    width:22px; height:22px; border-radius:50%; cursor:pointer; display:none;
+    align-items:center; justify-content:center; color:var(--muted);
+    font-size:15px; line-height:1; user-select:none;
+  }
+  .search-clear:hover{ background:var(--rowHover); color:var(--accent); }
+  .search-clear.show{ display:flex; }
+  .search-scope{
+    position:absolute; right:40px; top:50%; transform:translateY(-50%);
+    font-size:11px; color:var(--bg); background:var(--accent2);
+    padding:3px 9px; border-radius:10px; font-weight:700; display:none;
+  }
+  .btn{
+    cursor:pointer; background:var(--accent); color:#fff; border:none;
+    border-radius:10px; padding:12px 18px; font-size:14px; font-weight:700;
+    white-space:nowrap;
+  }
+  .btn:hover{filter:brightness(1.1);}
+  .btn.secondary{background:var(--panel2); color:var(--text); border:1px solid var(--border);}
+  .btn.secondary:hover{border-color:var(--accent);}
+
+  .meta-line{
+    max-width:1500px; margin:10px auto 0; padding:0 16px;
+    color:var(--muted); font-size:12.5px; display:flex; gap:14px; flex-wrap:wrap; justify-content:center;
+  }
+  .meta-line b{color:var(--text);}
+
+  .table-shell{
+    max-width:1500px; margin:14px auto 40px; padding:0 16px;
+  }
+  .table-scroll{
+    overflow-x:auto; border:1px solid var(--border); border-radius:12px;
+    background:var(--panel);
+  }
+  table{border-collapse:collapse; width:100%; min-width:920px;}
+  thead th{
+    position:sticky; top:0; background:var(--head); z-index:2;
+    text-align:left; padding:11px 12px; font-size:12.5px; letter-spacing:.4px;
+    text-transform:uppercase; color:var(--muted); white-space:nowrap;
+    border-bottom:2px solid var(--border); cursor:pointer; user-select:none;
+  }
+  thead th:hover{color:var(--text);}
+  thead th.col-active{color:var(--accent2);}
+  thead th .arrow{font-size:10px; margin-left:4px; opacity:.85;}
+  thead th.highlight-col{background:var(--accent); color:#fff;}
+  tbody td{
+    padding:9px 10px; border-bottom:1px solid var(--border);
+    white-space:normal; vertical-align:middle;
+  }
+  tbody td.col-name{min-width:170px;}
+  /* colonne che restano su una riga */
+  thead th[data-key="make"], tbody td.col-make,
+  thead th[data-key="country"], thead th[data-key="cls"]{ white-space:nowrap; }
+  tbody tr:nth-child(even){background:var(--rowAlt);}
+  tbody tr:nth-child(odd){background:var(--row);}
+  tbody tr:hover{background:var(--rowHover);}
+  td.cell-highlight{background:var(--highlight) !important;}
+
+  .badge{
+    display:inline-block; padding:2px 8px; border-radius:6px; font-size:11.5px;
+    font-weight:700; background:var(--badge); color:var(--text);
+  }
+  .cls{display:inline-flex; align-items:center; gap:7px;}
+  .cls .tag, .brand-item .tag{padding:2px 8px; border-radius:6px; font-weight:800; font-size:11.5px; color:#fff; display:inline-block;}
+  .cls .pi{color:var(--muted); font-variant-numeric:tabular-nums;}
+  .cD{background:#5a6675;} .cC{background:#c79a17;} .cB{background:#e67e22;}
+  .cA{background:#d63a2f;} .cS1{background:#7b3fe4;} .cS2{background:#2f7be4;}
+  .cR{background:#10a37f;} .cX{background:#111;}
+
+  .price-input{
+    width:100px; padding:6px 6px; font-size:13px; text-align:right;
+    background:var(--inputBg); color:var(--text);
+    border:1px solid var(--border); border-radius:7px;
+    font-variant-numeric:tabular-nums;
+  }
+  .price-input:focus{outline:none; border-color:var(--accent2);}
+  .price-input.has-val{color:var(--accent2); font-weight:700;}
+  thead th[data-key="price"], thead th[data-key="priceDisc"]{ text-align:right; }
+  tbody td.col-price{ text-align:right; white-space:nowrap; }
+  .price-val{ color:var(--accent2); font-weight:700; font-variant-numeric:tabular-nums; }
+
+  /* Brand popup */
+  .overlay{
+    position:fixed; inset:0; background:rgba(0,0,0,.55);
+    display:none; align-items:flex-start; justify-content:center; z-index:50; padding:40px 16px;
+    overflow:auto;
+  }
+  .overlay.open{display:flex;}
+  .popup{
+    background:var(--panel); border:1px solid var(--border); border-radius:14px;
+    width:min(95vw,1200px); padding:18px 20px 22px;
+    box-shadow:0 20px 60px rgba(0,0,0,.5);
+  }
+  .popup h3{margin:0 0 4px; font-size:18px;}
+  .popup .hint{color:var(--muted); font-size:12.5px; margin-bottom:14px;}
+  .popup .close-x{float:right; cursor:pointer; color:var(--muted); font-size:22px; line-height:1;}
+  .popup .close-x:hover{color:var(--accent);}
+  .brand-grid-scroll{ max-width:100%; }
+  .brand-grid{
+    column-width:175px; column-gap:18px;
+  }
+  .brand-item{
+    cursor:pointer; padding:6px 10px; border-radius:7px; font-size:13px;
+    border:1px solid transparent; white-space:nowrap;
+    break-inside:avoid; -webkit-column-break-inside:avoid;
+  }
+  .brand-item:hover{background:var(--rowHover); border-color:var(--accent);}
+  .brand-item .cnt{color:var(--muted); font-size:11px; margin-left:5px;}
+  .brand-item.all{font-weight:800; color:var(--accent2);}
+  .empty{padding:30px; text-align:center; color:var(--muted);}
+  @media (max-width:600px){
+    h1{font-size:22px;}
+  }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-right">
+    <button class="theme-toggle" id="themeBtn">☀ Tema chiaro</button>
+    <div class="lang-dd" id="langDD">
+      <button class="theme-toggle" id="langBtn">🇮🇹 IT ▾</button>
+      <div class="lang-menu" id="langMenu"></div>
+    </div>
+  </div>
+  <h1>Forza Horizon 6 <span class="accent" id="titleSub">Lista Auto</span></h1>
+  <div class="updated" id="updatedTxt">Updated 19 May 2026</div>
+</header>
+
+<div class="controls">
+  <div class="search-wrap">
+    <span class="ico">🔍</span>
+    <input id="search" type="text" placeholder="Cerca auto, marca, tipo, classe, nazione, collezione, DLC…" autocomplete="off">
+    <span class="search-scope" id="searchScope"></span>
+    <span class="search-clear" id="searchClear" title="Azzera ricerca">&times;</span>
+  </div>
+  <button class="btn" id="brandBtn">Cerca per Marca ▾</button>
+  <button class="btn" id="typeBtn">Cerca per Tipo ▾</button>
+  <button class="btn" id="classBtn">Cerca per Classe ▾</button>
+  <button class="btn secondary" id="resetBtn">Azzera filtri</button>
+</div>
+
+<div class="meta-line">
+  <span id="metaCount"></span>
+  <span id="activeFilter"></span>
+  <span id="metaInfo"></span>
+</div>
+
+<div class="table-shell">
+  <div class="table-scroll">
+    <table id="carTable">
+      <thead>
+        <tr id="headRow">
+          <th data-key="make">Marca</th>
+          <th data-key="name">Nome</th>
+          <th data-key="type">Tipo</th>
+          <th data-key="cls">Classe</th>
+          <th data-key="country">Nazione</th>
+          <th data-key="collection">Collezione</th>
+          <th data-key="dlc">DLC</th>
+          <th data-key="price">Prezzo</th>
+          <th data-key="priceDisc">Prezzo Scontato</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+  <div class="empty" id="emptyMsg" style="display:none;">Nessuna auto trovata.</div>
+</div>
+
+<!-- Brand popup -->
+<div class="overlay" id="brandOverlay">
+  <div class="popup">
+    <span class="close-x" id="brandClose">&times;</span>
+    <h3 id="popupTitle">Cerca per Marca</h3>
+    <div class="hint" id="popupHint">Clicca una marca per filtrare la tabella. 10 marche per colonna.</div>
+    <div class="brand-grid-scroll"><div class="brand-grid" id="brandGrid"></div></div>
+  </div>
+</div>
+
+<script>
+/* ======================= DATA =======================
+   Fonte cataloghi: forza.net/fh6cars (aggiornato 19 May 2026).
+   Formato riga: Marca|Nome|Tipo|Classe(PI + lettera)|Nazione|Collezione|DLC
+   I prezzi NON sono disponibili nei file del gioco in forma leggibile,
+   quindi le colonne Prezzo / Prezzo Scontato sono vuote e modificabili a mano. */
+const RAW = String.raw`
+Abarth|1968 Abarth 595 esseesse|Cult Cars|100 D|Italy|Autoshow, Wheelspin|
+Abarth|1980 Abarth Fiat 131|Classic Rally|399 D|Italy|Autoshow, Wheelspin|
+Abarth|2016 Abarth 695 Biposto|Hot Hatch|540 B|Italy|Seasonal|
+Acura|2001 Acura Integra Type R|Retro Hot Hatch|471 C|USA|Autoshow, Wheelspin|
+Acura|2002 Acura RSX Type S|Retro Hot Hatch|462 C|USA|Autoshow, Wheelspin|
+Acura|2022 Acura NSX Type S|Modern Supercars|734 S1|USA|Seasonal|
+Acura|2023 Acura Integra A-Spec|Hot Hatch|484 C|USA|Autoshow, Wheelspin|
+Alfa Romeo|1965 Alfa Romeo Giulia Sprint GTA Stradale|Rare Classics|379 D|Italy|Autoshow, Wheelspin|
+Alfa Romeo|1965 Alfa Romeo Giulia TZ2|Classic Racers|532 B|Italy|Collection Journal, Seasonal|
+Alfa Romeo|1968 Alfa Romeo 33 Stradale|Classic Racers|593 B|Italy|Autoshow, Wheelspin|
+Alfa Romeo|1990 Alfa Romeo SE 048SP|Retro Racers|978 R|Italy|Autoshow DLC|Italian Passion Car Pack
+Alfa Romeo|1992 Alfa Romeo 155 Q4|Retro Super Saloons|439 C|Italy|Autoshow|
+Alfa Romeo|2007 Alfa Romeo 8C Competizione|GT Cars|635 A|Italy|Autoshow, Wheelspin|
+Alfa Romeo|2014 Alfa Romeo 4C|Modern Sports Cars|644 A|Italy|Autoshow|
+Alfa Romeo|2017 Alfa Romeo Giulia Quadrifoglio|Modern Super Saloons|667 A|Italy|Autoshow, Wheelspin|
+Alfa Romeo|2021 Alfa Romeo Giulia GTAm|Modern Super Saloons|717 S1|Italy|Autoshow DLC|Italian Passion Car Pack
+Alumicraft|2015 Alumicraft Class 10 Race Car|Unlimited Buggies|532 B|USA|Autoshow, Wheelspin|
+Alumicraft|2021 Alumicraft #122 Class 1 Buggy|Unlimited Buggies|571 B|USA|Autoshow, Wheelspin|
+Alumicraft|2022 Alumicraft #6165 Trick Truck|Unlimited Offroad|485 C|USA|Autoshow, Wheelspin|
+AMG Transport Dynamics|2554 AMG Transport Dynamics M12S Warthog CST|Unlimited Offroad|663 A|USA|Autoshow, Collection Journal|
+Apollo|2019 Apollo Intensa Emozione|Extreme Track Toys|916 R|Germany|Wheelspin, Seasonal|
+Ariel|2013 Ariel Atom 500 V8|Extreme Track Toys|825 S2|UK|Autoshow, Wheelspin|
+Ariel|2016 Ariel Nomad|Unlimited Buggies|601 A|UK|Autoshow, Collection Journal, Wheelspin|
+Aston Martin|1964 Aston Martin DB5|Rare Classics|416 C|UK|Autoshow|
+Aston Martin|2016 Aston Martin Vulcan|Extreme Track Toys|884 S2|UK|Autoshow, Wheelspin, Loyalty|
+Aston Martin|2017 Aston Martin DB11|Super GT|679 A|UK|Autoshow, Wheelspin|
+Aston Martin|2017 Aston Martin Vulcan AMR Pro|Extreme Track Toys|898 S2|UK|Autoshow, Wheelspin|
+Aston Martin|2019 Aston Martin DBS Superleggera|Super GT|736 S1|UK|Wheelspin, Seasonal|
+Aston Martin|2019 Aston Martin Valhalla Concept Car|Hypercars|960 R|UK|Wheelspin, Seasonal|
+Aston Martin|2019 Aston Martin Vantage|GT Cars|696 A|UK|Autoshow|
+Aston Martin|2021 Aston Martin DBX|Sports Utility Heroes|618 A|UK|Seasonal|
+Aston Martin|2022 Aston Martin Valkyrie AMR Pro|Extreme Track Toys|989 R|UK|Autoshow, Collection Journal, Wheelspin|
+Aston Martin|2023 Aston Martin Valkyrie|Hypercars|924 R|UK|Autoshow, Wheelspin|
+Audi|1984 Audi Sport quattro|Retro Rally|526 B|Germany|Wheelspin, Seasonal|
+Audi|1986 Audi #2 Audi Sport quattro S1|Rally Monsters|726 S1|Germany|Autoshow, Wheelspin|
+Audi|2001 Audi RS 4 Avant|Retro Super Saloons|544 B|Germany|Autoshow, Wheelspin|
+Audi|2003 Audi RS 6|Retro Super Saloons|556 B|Germany|Autoshow, Wheelspin|
+Audi|2006 Audi RS 4|Modern Super Saloons|593 B|Germany|Autoshow, Wheelspin|
+Audi|2009 Audi R8 LMS|Extreme Track Toys|810 S2|Germany|Autoshow, Wheelspin|
+Audi|2009 Audi RS 6|Modern Super Saloons|598 B|Germany|Autoshow, Wheelspin|
+Audi|2010 Audi TT RS Coupé|Modern Sports Cars|593 B|Germany|Autoshow, Wheelspin|
+Audi|2011 Audi RS 3 Sportback|Super Hot Hatch|565 B|Germany|Autoshow, Wheelspin|
+Audi|2011 Audi RS 5 Coupé|Modern Super Saloons|613 A|Germany|Autoshow, Wheelspin|
+Audi|2013 Audi R8 Coupé V10 plus 5.2 FSI quattro|Modern Supercars|694 A|Germany|Collection Journal, Seasonal|
+Audi|2013 Audi RS 4 Avant|Modern Super Saloons|607 A|Germany|Autoshow, Wheelspin|
+Audi|2013 Audi RS 7 Sportback|Modern Super Saloons|619 A|Germany|Autoshow, Wheelspin|
+Audi|2015 Audi RS 6 Avant|Modern Super Saloons|640 A|Germany|Autoshow, Wheelspin|
+Audi|2015 Audi S1|Hot Hatch|527 B|Germany|Autoshow, Wheelspin|
+Audi|2016 Audi R8 V10 plus|Modern Supercars|731 S1|Germany|Autoshow, Wheelspin|
+Audi|2018 Audi RS 4 Avant|Modern Super Saloons|637 A|Germany|Autoshow, Wheelspin|
+Audi|2020 Audi R8 V10 performance|Modern Supercars|738 S1|Germany|Autoshow, Wheelspin|
+Audi|2020 Audi RS 3 Sedan|Modern Super Saloons|617 A|Germany|Autoshow, Wheelspin|
+Audi|2021 Audi RS 6 Avant|Modern Super Saloons|650 A|Germany|Autoshow, Wheelspin|
+Audi|2021 Audi RS 7 Sportback|Modern Super Saloons|655 A|Germany|Autoshow, Wheelspin|
+Audi|2021 Audi RS e-tron GT|Modern Super Saloons|677 A|Germany|Autoshow, Wheelspin|
+Audi|2023 Audi R8 Coupé V10 GT RWD|Modern Supercars|769 S1|Germany|Autoshow DLC|Car Pass
+Austin-Healey|1965 Austin-Healey 3000 MkIII|Classic Sports Cars|352 D|UK|Autoshow, Wheelspin|
+Autozam|1993 Autozam AZ-1|Eclectic Domestics|342 D|Japan|Autoshow, Wheelspin|
+BAC|2014 BAC Mono|Track Toys|766 S1|UK|Autoshow, Wheelspin|
+Bentley|2016 Bentley Bentayga|Sports Utility Heroes|612 A|UK|Wheelspin, Seasonal|
+Bentley|2021 Bentley Continental GT Convertible|GT Cars|649 A|UK|Autoshow, Collection Journal, Wheelspin|
+BMW|1957 BMW Isetta 300 Export|Cult Cars|100 D|Germany|Autoshow, Wheelspin|
+BMW|1973 BMW 2002 Turbo|Classic Sports Cars|424 C|Germany|Autoshow, Wheelspin|
+BMW|1981 BMW M1|Retro Supercars|510 B|Germany|Collection Journal|
+BMW|1988 BMW M3|Retro Super Saloons|474 C|Germany|Autoshow, Wheelspin|
+BMW|1988 BMW M5|Retro Super Saloons|470 C|Germany|Autoshow, Wheelspin|
+BMW|1995 BMW 850CSi|Retro Sports Cars|493 C|Germany|Autoshow, Wheelspin|
+BMW|1995 BMW M5|Retro Super Saloons|516 B|Germany|Autoshow, Wheelspin|
+BMW|1997 BMW M3|Retro Super Saloons|549 B|Germany|Autoshow, Wheelspin|
+BMW|2003 BMW M5|Retro Super Saloons|580 B|Germany|Autoshow, Wheelspin|
+BMW|2005 BMW M3|Retro Super Saloons|554 B|Germany|Autoshow, Wheelspin|
+BMW|2008 BMW M3|Modern Super Saloons|608 A|Germany|Autoshow, Wheelspin|
+BMW|2008 BMW Z4 M Coupé|Modern Sports Cars|579 B|Germany|Autoshow, Wheelspin|
+BMW|2009 BMW M5|Modern Super Saloons|595 B|Germany|Autoshow, Wheelspin|
+BMW|2010 BMW M3 GTS|Track Toys|678 A|Germany|Autoshow, Wheelspin|
+BMW|2011 BMW X5 M|Sports Utility Heroes|546 B|Germany|Autoshow, Wheelspin|
+BMW|2012 BMW M5|Modern Super Saloons|652 A|Germany|Autoshow, Wheelspin|
+BMW|2014 BMW M4 Coupé|Modern Super Saloons|679 A|Germany|Autoshow, Wheelspin|
+BMW|2015 BMW i8|Modern Sports Cars|665 A|Germany|Autoshow, Wheelspin|
+BMW|2016 BMW M4 GTS|Track Toys|711 S1|Germany|Autoshow, Wheelspin|
+BMW|2019 BMW Z4 Roadster|Modern Sports Cars|634 A|Germany|Autoshow, Collection Journal, Wheelspin|
+BMW|2020 BMW M2 Competition Coupé|Modern Super Saloons|656 A|Germany|Wheelspin, Seasonal|
+BMW|2020 BMW M8 Competition Coupé|GT Cars|684 A|Germany|Autoshow, Wheelspin|
+BMW|2021 BMW M4 Competition Coupé|Modern Super Saloons|666 A|Germany|Autoshow, Wheelspin|
+BMW|2021 BMW M4 Competition Coupé Welcome Pack|Modern Super Saloons|800 S1|Germany|Autoshow DLC|Welcome Pack
+BMW|2022 BMW iX xDrive50|Sports Utility Heroes|595 B|Germany|Autoshow, Wheelspin|
+BMW|2022 BMW M5 CS|Modern Super Saloons|731 S1|Germany|Autoshow, Wheelspin|
+BMW|2023 BMW M2|Modern Super Saloons|647 A|Germany|Autoshow, Wheelspin|
+BMW|2023 BMW M2 Forza Edition|Track Toys|700 A|Germany|Collection Journal, Seasonal|
+BMW|2024 BMW X6 M Competition|Sports Utility Heroes|672 A|Germany|Autoshow, Wheelspin|
+Buick|1987 Buick Regal GNX|Retro Muscle|454 C|USA|Autoshow|
+Cadillac|2013 Cadillac XTS Limousine|Modern Super Saloons|381 D|USA|Autoshow, Wheelspin|
+Cadillac|2016 Cadillac ATS-V|Modern Muscle|601 A|USA|Autoshow, Wheelspin|
+Cadillac|2016 Cadillac CTS-V Sedan|Modern Muscle|648 A|USA|Autoshow, Wheelspin|
+Cadillac|2022 Cadillac CT4-V Blackwing|Modern Muscle|650 A|USA|Autoshow, Wheelspin|
+Cadillac|2022 Cadillac CT5-V Blackwing|Modern Muscle|701 S1|USA|Autoshow, Wheelspin|
+Can-Am|2018 Can-Am Maverick X RS Turbo R|UTV's|568 B|Canada|Autoshow, Wheelspin|
+Casey Currie Motorsports|2019 Casey Currie Motorsports #4402 Ultra 4 'Trophy Jeep'|Unlimited Offroad|641 A|USA|Wheelspin, Seasonal|
+Chevrolet|1953 Chevrolet Corvette|Classic Sports Cars|270 D|USA|Autoshow, Wheelspin|
+Chevrolet|1955 Chevrolet 150 Utility Sedan|Rods and Customs|221 D|USA|Autoshow, Wheelspin|
+Chevrolet|1957 Chevrolet Bel Air|Rods and Customs|320 D|USA|Autoshow, Wheelspin|
+Chevrolet|1960 Chevrolet Corvette|Classic Sports Cars|428 C|USA|Wheelspin, Seasonal|
+Chevrolet|1964 Chevrolet Impala Super Sport 409|Rods and Customs|427 C|USA|Autoshow, Wheelspin|
+Chevrolet|1967 Chevrolet Corvette Stingray 427|Classic Muscle|510 B|USA|Collection Journal, Seasonal|
+Chevrolet|1969 Chevrolet Camaro Super Sport Coupe|Classic Muscle|471 C|USA|Autoshow, Wheelspin|
+Chevrolet|1969 Chevrolet Nova Super Sport 396|Classic Muscle|431 C|USA|Autoshow, Wheelspin|
+Chevrolet|1970 Chevrolet Camaro Z28|Classic Muscle|430 C|USA|Autoshow, Wheelspin|
+Chevrolet|1970 Chevrolet Chevelle Super Sport 454|Classic Muscle|424 C|USA|Autoshow, Wheelspin|
+Chevrolet|1970 Chevrolet Corvette ZR-1|Classic Muscle|497 C|USA|Autoshow, Wheelspin|
+Chevrolet|1970 Chevrolet El Camino Super Sport 454|Utility Heroes|430 C|USA|Autoshow, Wheelspin|
+Chevrolet|1972 Chevrolet K-10 Custom|Pickups & 4x4's|268 D|USA|Autoshow, Wheelspin|
+Chevrolet|1979 Chevrolet Camaro Z28|Classic Muscle|364 D|USA|Autoshow, Wheelspin|
+Chevrolet|1988 Chevrolet Monte Carlo Super Sport|Retro Muscle|282 D|USA|Autoshow, Wheelspin|
+Chevrolet|1995 Chevrolet Corvette ZR-1|Retro Muscle|576 B|USA|Autoshow, Wheelspin|
+Chevrolet|1996 Chevrolet Impala Super Sport|Retro Muscle|407 C|USA|Autoshow, Wheelspin|
+Chevrolet|2002 Chevrolet Corvette Z06|Retro Muscle|602 A|USA|Autoshow, Wheelspin|
+Chevrolet|2009 Chevrolet Corvette ZR1|Modern Muscle|712 S1|USA|Autoshow, Wheelspin|
+Chevrolet|2015 Chevrolet Camaro Z/28|Track Toys|695 A|USA|Autoshow, Wheelspin|
+Chevrolet|2015 Chevrolet Corvette Z06|Modern Muscle|755 S1|USA|Autoshow, Wheelspin|
+Chevrolet|2017 Chevrolet Camaro ZL1|Modern Muscle|727 S1|USA|Autoshow, Wheelspin|
+Chevrolet|2018 Chevrolet Camaro ZL1 1LE|Track Toys|728 S1|USA|Autoshow, Wheelspin|
+Chevrolet|2019 Chevrolet Corvette ZR1|Track Toys|778 S1|USA|Wheelspin, Seasonal|
+Chevrolet|2020 Chevrolet Corvette Stingray Coupe|Modern Supercars|700 A|USA|Autoshow, Wheelspin|
+Chevrolet|2020 Chevrolet Silverado LT Trail Boss|Pickups & 4x4's|449 C|USA|Autoshow, Wheelspin|
+Chevrolet|2023 Chevrolet Corvette Z06|Track Toys|763 S1|USA|Autoshow, Wheelspin|
+Chevrolet|2024 Chevrolet Corvette E-Ray|Modern Supercars|737 S1|USA|Autoshow, Wheelspin, Loyalty|
+Datsun|1969 Datsun 2000 Roadster|Classic Sports Cars|323 D|Japan|Seasonal|
+Datsun|1970 Datsun 510|Classic Sports Cars|143 D|Japan|Autoshow, Wheelspin|
+Datsun|1972 Datsun #269 Attacking the Clock Racing 240Z 'All Carbon Hill Climb Beast'|Extreme Track Toys|951 R|Japan|Autoshow DLC|Car Pass
+DeBerti|2013 DeBerti Jeep Wrangler Unlimited|Unlimited Offroad|645 A|USA|Autoshow, Wheelspin|
+DeBerti|2018 DeBerti Chevrolet Silverado 1500 Drift Truck|Drift Cars|707 S1|USA|Autoshow, Wheelspin|
+DeBerti|2019 DeBerti Ford Super Duty F-250 Lariat 'Transformer'|Unlimited Offroad|548 B|USA|Autoshow, Wheelspin|
+DeBerti|2019 DeBerti Toyota Tacoma TRD 'The Performance Truck'|Drift Cars|717 S1|USA|Autoshow, Wheelspin|
+DeLorean|1982 DeLorean DMC-12|Retro Sports Cars|357 D|USA|Autoshow, Wheelspin|
+Dodge|1968 Dodge Dart HEMI Super Stock|Classic Muscle|540 B|USA|Wheelspin, Seasonal|
+Dodge|1969 Dodge Charger Daytona HEMI|Classic Muscle|479 C|USA|Autoshow, Collection Journal, Wheelspin|
+Dodge|1969 Dodge Charger R/T|Classic Muscle|417 C|USA|Collection Journal|
+Dodge|1970 Dodge Challenger R/T|Classic Muscle|443 C|USA|Wheelspin, Seasonal|
+Dodge|1970 Dodge Coronet Super Bee|Classic Muscle|455 C|USA|Autoshow, Wheelspin|
+Dodge|1999 Dodge Viper GTS ACR|Retro Muscle|598 B|USA|Autoshow|
+Dodge|1999 Dodge Viper GTS ACR Forza Edition|Unlimited Offroad|700 A|USA|Autoshow DLC|VIP
+Dodge|2006 Dodge Ram SRT-10|Modern Muscle|547 B|USA|Seasonal|
+Dodge|2008 Dodge Viper SRT-10 ACR|Track Toys|735 S1|USA|Autoshow, Wheelspin|
+Dodge|2015 Dodge Challenger SRT Hellcat|Modern Muscle|631 A|USA|Autoshow, Wheelspin|
+Dodge|2015 Dodge Charger SRT Hellcat|Modern Muscle|637 A|USA|Autoshow, Wheelspin|
+Dodge|2016 Dodge Viper ACR|Track Toys|786 S1|USA|Wheelspin, Seasonal|
+Dodge|2018 Dodge Challenger SRT Demon|Modern Muscle|678 A|USA|Autoshow, Collection Journal, Wheelspin|
+Dodge|2021 Dodge Durango SRT Hellcat|Sports Utility Heroes|628 A|USA|Collection Journal, Seasonal|
+Dodge|2022 Dodge Challenger SRT Super Stock|Modern Muscle|695 A|USA|Autoshow, Wheelspin|
+Ferrari|1962 Ferrari 250 GT Berlinetta Lusso|Rare Classics|475 C|Italy|Autoshow, Collection Journal|
+Ferrari|1962 Ferrari 250 GTO|Classic Racers|494 C|Italy|Autoshow, Wheelspin|
+Ferrari|1967 Ferrari #24 Ferrari Spa 330 P4|Classic Racers|684 A|Italy|Autoshow, Wheelspin|
+Ferrari|1967 Ferrari 275 GTB4 Spider|Rare Classics|490 C|Italy|Autoshow DLC|Italian Passion Car Pack
+Ferrari|1969 Ferrari Dino 246 GT|Rare Classics|428 C|Italy|Autoshow, Wheelspin|
+Ferrari|1970 Ferrari 512 S|Classic Racers|774 S1|Italy|Autoshow, Wheelspin|
+Ferrari|1984 Ferrari 288 GTO|Retro Supercars|643 A|Italy|Wheelspin, Seasonal|
+Ferrari|1987 Ferrari F40|Retro Supercars|678 A|Italy|Autoshow, Collection Journal|
+Ferrari|1989 Ferrari F40 Competizione|Retro Racers|948 R|Italy|Autoshow, Wheelspin|
+Ferrari|1992 Ferrari 512 TR|Retro Supercars|615 A|Italy|Wheelspin, Seasonal|
+Ferrari|1994 Ferrari F355 Berlinetta|Retro Supercars|588 B|Italy|Wheelspin, Seasonal|
+Ferrari|1995 Ferrari F50|Retro Supercars|678 A|Italy|Autoshow, Wheelspin|
+Ferrari|1996 Ferrari F50 GT|Extreme Track Toys|949 R|Italy|Collection Journal, Seasonal|
+Ferrari|2002 Ferrari Enzo Ferrari|Retro Supercars|755 S1|Italy|Autoshow|
+Ferrari|2005 Ferrari FXX|Extreme Track Toys|900 S2|Italy|Autoshow, Wheelspin|
+Ferrari|2007 Ferrari 430 Scuderia|Modern Supercars|702 S1|Italy|Autoshow, Wheelspin|
+Ferrari|2009 Ferrari 458 Italia|Modern Supercars|721 S1|Italy|Autoshow, Wheelspin|
+Ferrari|2010 Ferrari 599XX|Extreme Track Toys|840 S2|Italy|Autoshow, Wheelspin|
+Ferrari|2012 Ferrari 599XX Evolution|Extreme Track Toys|894 S2|Italy|Wheelspin, Seasonal|
+Ferrari|2013 Ferrari 458 Speciale|Track Toys|768 S1|Italy|Autoshow, Wheelspin|
+Ferrari|2013 Ferrari LaFerrari|Hypercars|857 S2|Italy|Autoshow, Wheelspin|
+Ferrari|2014 Ferrari FXX K|Extreme Track Toys|936 R|Italy|Autoshow, Wheelspin|
+Ferrari|2015 Ferrari 488 GTB|Modern Supercars|770 S1|Italy|Autoshow, Wheelspin|
+Ferrari|2015 Ferrari F12tdf|Super GT|788 S1|Italy|Autoshow, Wheelspin|
+Ferrari|2017 Ferrari 812 Superfast|Super GT|780 S1|Italy|Autoshow, Wheelspin|
+Ferrari|2017 Ferrari J50|Modern Supercars|772 S1|Italy|Autoshow, Wheelspin|
+Ferrari|2017 Ferrari J50 Preorder Car|Modern Supercars|800 S1|Italy|Autoshow DLC|Preorder Bonus
+Ferrari|2018 Ferrari FXX-K Evo|Extreme Track Toys|957 R|Italy|Autoshow, Wheelspin|
+Ferrari|2018 Ferrari FXX-K Evo Welcome Pack|Extreme Track Toys|998 R|Italy|Autoshow DLC|Welcome Pack
+Ferrari|2018 Ferrari Portofino|Super GT|714 S1|Italy|Autoshow, Wheelspin|
+Ferrari|2019 Ferrari 488 Pista|Track Toys|803 S2|Italy|Autoshow, Wheelspin|
+Ferrari|2019 Ferrari F8 Tributo|Modern Supercars|802 S2|Italy|Wheelspin, Seasonal|
+Ferrari|2019 Ferrari Monza SP2|Super GT|773 S1|Italy|Autoshow, Wheelspin|
+Ferrari|2020 Ferrari Roma|Super GT|735 S1|Italy|Seasonal|
+Ferrari|2020 Ferrari SF90 Stradale|Hypercars|851 S2|Italy|Autoshow, Wheelspin|
+Ferrari|2022 Ferrari 296 GTB|Modern Supercars|811 S2|Italy|Seasonal|
+Ferrari|2025 Ferrari F80|Hypercars|920 R|Italy|Autoshow DLC|Italian Passion Car Pack
+Ford|1932 Ford De Luxe Five-Window Coupe|Rods and Customs|100 D|USA|Autoshow, Wheelspin|
+Ford|1965 Ford Mustang GT Coupe|Classic Muscle|388 D|USA|Autoshow|
+Ford|1966 Ford #2 GT40 Mk II|Classic Racers|666 A|USA|Autoshow, Wheelspin|
+Ford|1968 Ford Mustang GT 2+2 Fastback|Classic Muscle|394 D|USA|Autoshow, Wheelspin|
+Ford|1968 Ford Mustang GT 2+2 Fastback Forza Edition|Drift Cars|700 A|USA|Wheelspin, Seasonal|
+Ford|1969 Ford Mustang Boss 302|Classic Muscle|468 C|USA|Autoshow, Wheelspin|
+Ford|1973 Ford Capri RS3100|Classic Sports Cars|394 D|USA|Autoshow, Wheelspin|
+Ford|1973 Ford XB Falcon GT|Classic Muscle|422 C|USA|Autoshow, Wheelspin|
+Ford|1977 Ford #5 Escort RS1800 MkII|Classic Rally|544 B|USA|Autoshow, Wheelspin|
+Ford|1985 Ford RS200 Evolution|Rally Monsters|710 S1|USA|Seasonal|
+Ford|1986 Ford F-150 XLT Lariat|Pickups & 4x4's|263 D|USA|Autoshow, Wheelspin|
+Ford|1986 Ford F-150 XLT Lariat Forza Edition|Drift Cars|850 S2|USA|Wheelspin, Seasonal|
+Ford|1987 Ford Sierra Cosworth RS500|Retro Super Saloons|484 C|USA|Collection Journal|
+Ford|1992 Ford Escort RS Cosworth|Retro Rally|456 C|USA|Autoshow, Wheelspin|
+Ford|1993 Ford Mustang SVT Cobra R|Retro Muscle|432 C|USA|Autoshow, Wheelspin|
+Ford|1994 Ford Supervan 3|Track Toys|740 S1|USA|Autoshow, Wheelspin|
+Ford|1999 Ford Racing Puma|Retro Rally|401 C|USA|Autoshow, Wheelspin|
+Ford|2000 Ford Mustang SVT Cobra R|Retro Muscle|528 B|USA|Autoshow, Wheelspin|
+Ford|2001 Ford #4 Ford Focus RS|Rally Monsters|639 A|USA|Autoshow, Wheelspin|
+Ford|2003 Ford F-150 SVT Lightning|Pickups & 4x4's|474 C|USA|Seasonal|
+Ford|2003 Ford Focus RS|Retro Hot Hatch|484 C|USA|Autoshow, Wheelspin|
+Ford|2005 Ford GT|Retro Supercars|676 A|USA|Collection Journal|
+Ford|2009 Ford Focus RS|Super Hot Hatch|551 B|USA|Autoshow|
+Ford|2010 Ford Crown Victoria Police Interceptor|Retro Muscle|354 D|USA|Autoshow, Wheelspin|
+Ford|2011 Ford Transit SuperSportVan|Utility Heroes|235 D|USA|Autoshow, Wheelspin|
+Ford|2013 Ford Mustang Shelby GT500|Modern Muscle|647 A|USA|Autoshow, Wheelspin|
+Ford|2014 Ford #11 Rockstar F-150 Trophy Truck|Unlimited Offroad|613 A|USA|Autoshow, Wheelspin|
+Ford|2014 Ford FPV Limited Edition Pursuit Ute|Utility Heroes|563 B|USA|Autoshow, Wheelspin|
+Ford|2014 Ford Ranger T6 Rally Raid|Offroad|530 B|USA|Wheelspin, Seasonal|
+Ford|2016 Ford Mustang Shelby GT350R|Track Toys|721 S1|USA|Autoshow, Wheelspin|
+Ford|2017 Ford #14 Rahal Letterman Lanigan Racing Fiesta|Rally Monsters|772 S1|USA|Autoshow, Collection Journal|
+Ford|2017 Ford #25 'Brocky' Ultra4 Bronco RTR|Unlimited Offroad|644 A|USA|Autoshow, Collection Journal|
+Ford|2017 Ford Focus RS|Super Hot Hatch|588 B|USA|Autoshow, Collection Journal|
+Ford|2017 Ford GT|Modern Supercars|757 S1|USA|Autoshow, Wheelspin|
+Ford|2017 Ford M-Sport Fiesta RS|Rally Monsters|707 S1|USA|Wheelspin, Seasonal|
+Ford|2018 Ford Mustang RTR Spec 5|Modern Muscle|648 A|USA|Autoshow, Wheelspin|
+Ford|2020 Ford #2069 Ford Performance Bronco R|Offroad|441 C|USA|Autoshow, Wheelspin|
+Ford|2020 Ford Mustang Shelby GT500|Modern Muscle|734 S1|USA|Autoshow, Wheelspin|
+Ford|2020 Ford Super Duty F-450 DRW PLATINUM|Pickups & 4x4's|379 D|USA|Autoshow, Wheelspin|
+Ford|2020 Ford Super Duty F-450 DRW PLATINUM Forza Edition|Pickups & 4x4's|700 A|USA|Wheelspin, Seasonal|
+Ford|2022 Ford Bronco Raptor|Pickups & 4x4's|473 C|USA|Autoshow, Wheelspin|
+Ford|2022 Ford F-150 Lightning|Pickups & 4x4's|500 C|USA|Wheelspin, Seasonal|
+Ford|2022 Ford Focus ST|Hot Hatch|594 B|USA|Autoshow, Wheelspin|
+Ford|2022 Ford Supervan 4|Extreme Track Toys|919 R|USA|Collection Journal, Seasonal|
+Ford|2023 Ford F-150 Raptor R|Pickups & 4x4's|536 B|USA|Autoshow, Wheelspin|
+Ford|2023 Ford F-150 Raptor R Welcome Pack|Pickups & 4x4's|600 B|USA|Autoshow DLC|Welcome Pack
+Ford|2023 Ford Fiesta ST|Hot Hatch|500 C|USA|Autoshow, Wheelspin|
+Ford|2024 Ford Mustang Dark Horse|Modern Muscle|669 A|USA|Autoshow, Collection Journal|
+Ford|2024 Ford Mustang GT|Modern Muscle|628 A|USA|Autoshow, Wheelspin|
+Formula Drift|1989 Formula Drift #98 BMW 325i|Drift Cars|726 S1|USA|Autoshow, Wheelspin|
+Formula Drift|1995 Formula Drift #34 Toyota Supra MkIV|Drift Cars|759 S1|USA|Autoshow, Wheelspin|
+Formula Drift|1997 Formula Drift #777 Nissan 240SX|Drift Cars|748 S1|USA|Autoshow, Collection Journal|
+Formula Drift|2006 Formula Drift #43 Dodge Viper SRT-10 ACR|Drift Cars|748 S1|USA|Wheelspin, Seasonal|
+Formula Drift|2007 Formula Drift #117 599 GTB Fiorano|Drift Cars|767 S1|USA|Autoshow, Collection Journal|
+Formula Drift|2009 Formula Drift #99 Mazda RX-8|Drift Cars|737 S1|USA|Autoshow, Collection Journal|
+Formula Drift|2013 Formula Drift #777 Chevrolet Corvette|Drift Cars|760 S1|USA|Autoshow, Wheelspin|
+Formula Drift|2015 Formula Drift #13 Ford Mustang|Drift Cars|739 S1|USA|Wheelspin, Seasonal|
+Formula Drift|2016 Formula Drift #530 HSV Maloo GEN-F|Drift Cars|710 S1|USA|Autoshow, Wheelspin|
+Formula Drift|2019 Formula Drift #411 Toyota Corolla Hatchback|Drift Cars|754 S1|USA|Autoshow, Wheelspin|
+Formula Drift|2020 Formula Drift #151 Toyota GR Supra|Drift Cars|779 S1|USA|Autoshow, Wheelspin|
+Formula Drift|2020 Formula Drift #91 BMW M2|Drift Cars|748 S1|USA|Autoshow, Wheelspin|
+Formula Drift|2023 Formula Drift #64 Forsberg Racing Nissan Z|Drift Cars|783 S1|USA|Autoshow, Wheelspin|
+Funco Motorsports|2018 Funco Motorsports F9|Unlimited Buggies|752 S1|USA|Collection Journal, Seasonal|
+GMC|1970 GMC Jimmy|Pickups & 4x4's|416 C|USA|Autoshow|
+GMC|1991 GMC Syclone|Pickups & 4x4's|446 C|USA|Autoshow, Wheelspin|
+GMC|1992 GMC Typhoon|Sports Utility Heroes|435 C|USA|Autoshow, Wheelspin|
+GMC|2022 GMC HUMMER EV Pickup|Pickups & 4x4's|610 A|USA|Autoshow, Wheelspin|
+Gordon Murray Automotive|2020 Gordon Murray Automotive T.50|Hypercars|871 S2|UK|Autoshow, Collection Journal|
+GR|2025 GR GT Prototype|Super GT|771 S1|Japan|Autoshow, Wheelspin|
+Hennessey|2012 Hennessey Venom GT|Hypercars|845 S2|USA|Wheelspin, Seasonal|
+Hennessey|2019 Hennessey Ford F-150 VelociRaptor 6X6|Pickups & 4x4's|520 B|USA|Autoshow, Wheelspin|
+Hennessey|2021 Hennessey Venom F5|Hypercars|870 S2|USA|Autoshow, Wheelspin|
+Holden|1977 Holden Torana A9X|Classic Muscle|413 C|Australia|Autoshow, Wheelspin|
+Honda|1970 Honda S800|Cult Cars|134 D|Japan|Autoshow, Wheelspin|
+Honda|1974 Honda Civic RS|Retro Hot Hatch|254 D|Japan|Collection Journal, Seasonal|
+Honda|1984 Honda City E II|Eclectic Domestics|203 D|Japan|Autoshow, Collection Journal, Wheelspin|
+Honda|1984 Honda Civic CRX Mugen|Retro Sports Cars|390 D|Japan|Collection Journal, Seasonal|
+Honda|1986 Honda Civic Si|Retro Hot Hatch|253 D|Japan|Autoshow|
+Honda|1990 Honda #19 101 Motorsport CRX WTAC|Extreme Track Toys|877 S2|Japan|Autoshow DLC|Time Attack Car Pack
+Honda|1991 Honda Beat|Eclectic Domestics|283 D|Japan|Autoshow, Collection Journal, Wheelspin|
+Honda|1991 Honda CR-X SiR|Retro Hot Hatch|465 C|Japan|Seasonal|
+Honda|1992 Honda #21 Hardrace/JDMYard Civic WTAC|Extreme Track Toys|913 R|Japan|Autoshow DLC|Time Attack Car Pack
+Honda|1992 Honda NSX-R|Retro Sports Cars|572 B|Japan|Autoshow, Wheelspin|
+Honda|1994 Honda Acty|Eclectic Domestics|100 D|Japan|Autoshow, Collection Journal, Wheelspin|
+Honda|1994 Honda Prelude Si|Retro Hot Hatch|410 C|Japan|Autoshow, Collection Journal, Wheelspin|
+Honda|1997 Honda Civic Type R|Retro Hot Hatch|430 C|Japan|Autoshow, Wheelspin|
+Honda|2001 Honda #33 Integra WTAC|Extreme Track Toys|860 S2|Japan|Autoshow DLC|Time Attack Car Pack
+Honda|2003 Honda S2000|Modern Sports Cars|503 B|Japan|Autoshow, Wheelspin|
+Honda|2004 Honda #52 Evasive Motorsports S2000 WTAC|Extreme Track Toys|888 S2|Japan|Autoshow DLC|Time Attack Car Pack
+Honda|2004 Honda Civic Type R|Retro Hot Hatch|480 C|Japan|Autoshow, Wheelspin|
+Honda|2005 Honda NSX-R|Retro Sports Cars|570 B|Japan|Autoshow, Collection Journal|
+Honda|2005 Honda NSX-R GT|Retro Sports Cars|608 A|Japan|Collection Journal|
+Honda|2007 Honda Civic Type R|Hot Hatch|454 C|Japan|Autoshow, Wheelspin|
+Honda|2008 Honda Civic Type R (FD2)|Retro Super Saloons|514 B|Japan|Autoshow DLC|Car Pass
+Honda|2015 Honda Civic Type R|Super Hot Hatch|585 B|Japan|Autoshow, Wheelspin|
+Honda|2015 Honda Ridgeline Baja Trophy Truck|Unlimited Offroad|580 B|Japan|Autoshow, Wheelspin|
+Honda|2018 Honda Civic Type R|Super Hot Hatch|608 A|Japan|Autoshow, Wheelspin|
+Honda|2022 Honda e|Hot Hatch|398 D|Japan|Autoshow, Wheelspin|
+Honda|2023 Honda Civic Type R|Super Hot Hatch|620 A|Japan|Autoshow, Collection Journal, Wheelspin|
+HSV|2014 HSV GEN-F GTS|Modern Muscle|601 A|Australia|Autoshow, Wheelspin|
+HSV|2014 HSV Limited Edition GEN-F GTS Maloo|Utility Heroes|629 A|Australia|Autoshow, Wheelspin|
+Hyundai|2019 Hyundai Veloster N|Super Hot Hatch|532 B|Korea|Autoshow, Wheelspin|
+Hyundai|2020 Hyundai i30 N|Super Hot Hatch|553 B|Korea|Autoshow, Wheelspin|
+Hyundai|2021 Hyundai i20 N|Hot Hatch|564 B|Korea|Autoshow, Wheelspin|
+Hyundai|2022 Hyundai N Vision 74|Track Toys|692 A|Korea|Autoshow, Wheelspin|
+Hyundai|2023 Hyundai IONIQ 5 N|Sports Utility Heroes|657 A|Korea|Autoshow, Wheelspin|
+Jaguar|1956 Jaguar D-Type|Classic Racers|506 B|UK|Autoshow, Wheelspin|
+Jaguar|1961 Jaguar E-type|Rare Classics|414 C|UK|Wheelspin, Seasonal|
+Jaguar|1964 Jaguar Lightweight E-Type|Classic Racers|568 B|UK|Autoshow, Wheelspin|
+Jaguar|1991 Jaguar Sport XJR-15|Retro Supercars|716 S1|UK|Autoshow, Collection Journal|
+Jaguar|1993 Jaguar XJ220|Retro Supercars|676 A|UK|Autoshow, Wheelspin|
+Jaguar|1993 Jaguar XJ220S TWR|Retro Supercars|750 S1|UK|Autoshow, Wheelspin|
+Jaguar|2010 Jaguar C-X75|Modern Supercars|810 S2|UK|Autoshow, Wheelspin|
+Jeep|2012 Jeep Wrangler Rubicon|Pickups & 4x4's|350 D|USA|Autoshow, Wheelspin|
+Jeep|2016 Jeep Trailcat|Unlimited Offroad|635 A|USA|Autoshow, Wheelspin|
+Jeep|2018 Jeep Grand Cherokee Trackhawk|Sports Utility Heroes|631 A|USA|Autoshow, Wheelspin|
+Jeep|2020 Jeep JT|Pickups & 4x4's|336 D|USA|Autoshow, Wheelspin|
+Jimco|2019 Jimco #240 Fastball Racing Class 6100 Spec Trophy Truck|Unlimited Offroad|511 B|USA|Autoshow, Wheelspin|
+Jimco|2020 Jimco #179 Hammerhead Class 1|Unlimited Buggies|652 A|USA|Autoshow, Wheelspin|
+Koenigsegg|2008 Koenigsegg CCGT|Extreme Track Toys|900 S2|Sweden|Autoshow, Wheelspin|
+Koenigsegg|2011 Koenigsegg Agera|Hypercars|810 S2|Sweden|Autoshow, Wheelspin|
+Koenigsegg|2015 Koenigsegg One:1|Hypercars|890 S2|Sweden|Wheelspin, Seasonal|
+Koenigsegg|2016 Koenigsegg Regera|Hypercars|886 S2|Sweden|Autoshow|
+Koenigsegg|2017 Koenigsegg Agera RS|Hypercars|890 S2|Sweden|Autoshow, Collection Journal|
+Koenigsegg|2020 Koenigsegg Jesko|Hypercars|899 S2|Sweden|Autoshow, Wheelspin|
+Koenigsegg|2024 Koenigsegg Gemera|Hypercars|900 S2|Sweden|Autoshow DLC|Car Pass
+KTM|2018 KTM X-Bow GT4|Extreme Track Toys|749 S1|Austria|Autoshow, Wheelspin|
+Lamborghini|1967 Lamborghini Miura P400|Rare Classics|505 B|Italy|Autoshow, Wheelspin|
+Lamborghini|1988 Lamborghini Countach LP5000 QV|Retro Supercars|622 A|Italy|Seasonal|
+Lamborghini|1997 Lamborghini Diablo SV|Retro Supercars|649 A|Italy|Collection Journal|
+Lamborghini|1999 Lamborghini Diablo GTR|Extreme Track Toys|823 S2|Italy|Wheelspin, Seasonal|
+Lamborghini|2010 Lamborghini Murciélago LP 670-4 SV|Modern Supercars|707 S1|Italy|Autoshow, Wheelspin|
+Lamborghini|2011 Lamborghini Sesto Elemento|Extreme Track Toys|871 S2|Italy|Wheelspin, Seasonal|
+Lamborghini|2012 Lamborghini Aventador LP700-4|Hypercars|753 S1|Italy|Wheelspin, Seasonal|
+Lamborghini|2012 Lamborghini Gallardo LP570-4 Spyder Performante|Modern Supercars|685 A|Italy|Autoshow, Wheelspin|
+Lamborghini|2013 Lamborghini Veneno|Hypercars|834 S2|Italy|Autoshow, Wheelspin|
+Lamborghini|2014 Lamborghini Huracán LP 610-4|Modern Supercars|738 S1|Italy|Autoshow, Wheelspin, Loyalty|
+Lamborghini|2016 Lamborghini Centenario LP 770-4|Hypercars|792 S1|Italy|Autoshow, Wheelspin, Loyalty|
+Lamborghini|2018 Lamborghini Aventador SVJ|Hypercars|794 S1|Italy|Autoshow, Wheelspin|
+Lamborghini|2019 Lamborghini Urus|Sports Utility Heroes|659 A|Italy|Autoshow, Collection Journal|
+Lamborghini|2020 Lamborghini Essenza SCV12|Extreme Track Toys|911 R|Italy|Autoshow, Wheelspin|
+Lamborghini|2020 Lamborghini Huracán EVO|Modern Supercars|761 S1|Italy|Seasonal|
+Lamborghini|2020 Lamborghini Huracán STO|Track Toys|783 S1|Italy|Autoshow, Wheelspin|
+Lamborghini|2020 Lamborghini Sián Roadster|Hypercars|797 S1|Italy|Autoshow, Wheelspin|
+Lamborghini|2021 Lamborghini Countach LPI 800-4|Hypercars|773 S1|Italy|Autoshow, Wheelspin|
+Lamborghini|2022 Lamborghini Aventador LP 780-4 Ultimae|Hypercars|794 S1|Italy|Seasonal|
+Lamborghini|2022 Lamborghini Huracán Sterrato|Rally Monsters|738 S1|Italy|Collection Journal, Seasonal|
+Lamborghini|2022 Lamborghini Huracán Tecnica|Modern Supercars|747 S1|Italy|Autoshow, Wheelspin|
+Lamborghini|2024 Lamborghini Revuelto|Hypercars|829 S2|Italy|Autoshow, Collection Journal|
+Lancia|1974 Lancia Stratos HF Stradale|Classic Rally|483 C|Italy|Collection Journal|
+Lancia|1986 Lancia Delta S4|Retro Rally|564 B|Italy|Autoshow, Wheelspin|
+Lancia|1992 Lancia Delta HF Integrale EVO|Retro Rally|489 C|Italy|Autoshow, Wheelspin|
+Land Rover|2015 Land Rover Range Rover Sport SVR|Sports Utility Heroes|604 A|UK|Autoshow, Collection Journal|
+Land Rover|2020 Land Rover Defender 110 X|Sports Utility Heroes|427 C|UK|Autoshow|
+Lexus|2010 Lexus LFA|Modern Supercars|699 A|USA|Autoshow|
+Lexus|2010 Lexus LFA Forza Edition|Extreme Track Toys|900 S2|USA|Collection Journal, Seasonal|
+Lexus|2015 Lexus RC F|Modern Super Saloons|623 A|USA|Autoshow, Wheelspin|
+Lexus|2021 Lexus LC 500|GT Cars|592 B|USA|Autoshow, Wheelspin|
+Lincoln|1962 Lincoln Continental|Rods and Customs|267 D|USA|Collection Journal|
+Lotus|1997 Lotus Elise GT1|Retro Supercars|709 S1|UK|Autoshow, Wheelspin|
+Lotus|1999 Lotus Elise Series 1 Sport 190|Retro Sports Cars|589 B|UK|Autoshow, Wheelspin|
+Lotus|2018 Lotus Exige Cup 430|Track Toys|732 S1|UK|Seasonal|
+Lotus|2018 Lotus Scura Motorsports Exige WTAC|Extreme Track Toys|998 R|UK|Collection Journal, Seasonal|
+Lotus|2020 Lotus Evija|Hypercars|937 R|UK|Autoshow, Wheelspin|
+Lotus|2020 Lotus Evija Forza Edition|Drift Cars|900 S2|UK|Autoshow DLC|VIP
+Lotus|2023 Lotus Emira|Modern Sports Cars|656 A|UK|Seasonal|
+Lucid|2024 Lucid Air Sapphire|Modern Super Saloons|820 S2|USA|Autoshow, Wheelspin|
+Maserati|1997 Maserati Ghibli Cup|Retro Sports Cars|591 B|Italy|Autoshow, Collection Journal|
+Maserati|2004 Maserati MC12|Retro Supercars|751 S1|Italy|Seasonal|
+Maserati|2008 Maserati MC12 Versione Corsa|Extreme Track Toys|912 R|Italy|Autoshow, Wheelspin|
+Maserati|2022 Maserati MC20|Modern Supercars|753 S1|Italy|Autoshow, Wheelspin|
+Mazda|1972 Mazda Cosmo 110S Series II|Classic Sports Cars|394 D|Japan|Seasonal|
+Mazda|1973 Mazda RX-3|Classic Sports Cars|328 D|Japan|Autoshow, Wheelspin|
+Mazda|1973 Mazda RX-3 Forza Edition|Classic Sports Cars|600 B|Japan|Aftermarket|
+Mazda|1974 Mazda #123 Mad Mike 808 Wagon 'FURSTY'|Drift Cars|702 S1|Japan|Car Pass|
+Mazda|1985 Mazda RX-7 GSL-SE|Retro Sports Cars|357 D|Japan|Collection Journal|
+Mazda|1990 Mazda Savanna RX-7|Retro Sports Cars|451 C|Japan|Autoshow, Wheelspin|
+Mazda|1991 Mazda #55 Mazda 787B|Retro Racers|988 R|Japan|Collection Journal|
+Mazda|1992 Mazda RX-7 Type R|Retro Sports Cars|548 B|Japan|Autoshow, Collection Journal|
+Mazda|1994 Mazda MX-5 Miata|Retro Sports Cars|329 D|Japan|Autoshow, Wheelspin|
+Mazda|1994 Mazda MX-5 Miata Forza Edition|Retro Sports Cars|850 S2|Japan|Aftermarket|
+Mazda|2005 Mazda Mazdaspeed MX-5|Retro Sports Cars|469 C|Japan|Autoshow, Wheelspin|
+Mazda|2008 Mazda Furai|Extreme Track Toys|926 R|Japan|Seasonal|
+Mazda|2010 Mazda Mazdaspeed 3|Hot Hatch|536 B|Japan|Autoshow, Wheelspin|
+Mazda|2011 Mazda RX-8 R3|Modern Sports Cars|508 B|Japan|Autoshow, Wheelspin|
+Mazda|2013 Mazda MX-5|Modern Sports Cars|432 C|Japan|Autoshow, Wheelspin|
+Mazda|2016 Mazda MX-5|Modern Sports Cars|499 C|Japan|Autoshow|
+Mazda|2017 Mazda MX-5 Cup|Track Toys|586 B|Japan|Autoshow, Collection Journal|
+Mazda|2022 Mazda MX-5 Miata RF|Modern Sports Cars|509 B|Japan|Autoshow, Wheelspin|
+McLaren|1993 McLaren F1|Retro Supercars|713 S1|UK|Autoshow, Wheelspin|
+McLaren|1997 McLaren F1 GT|Retro Supercars|769 S1|UK|Autoshow, Wheelspin|
+McLaren|2011 McLaren 12C Coupé|Modern Supercars|727 S1|UK|Autoshow, Wheelspin|
+McLaren|2013 McLaren P1|Hypercars|848 S2|UK|Autoshow, Wheelspin|
+McLaren|2014 McLaren 650S Spider|Modern Supercars|765 S1|UK|Autoshow, Wheelspin|
+McLaren|2015 McLaren 570S Coupé|Modern Supercars|721 S1|UK|Autoshow, Wheelspin|
+McLaren|2018 McLaren 600LT Coupé|Track Toys|780 S1|UK|Autoshow|
+McLaren|2019 McLaren Speedtail|Hypercars|835 S2|UK|Autoshow, Wheelspin|
+McLaren|2021 McLaren 620R|Track Toys|773 S1|UK|Wheelspin, Seasonal|
+McLaren|2021 McLaren 765LT Coupé|Track Toys|829 S2|UK|Autoshow, Wheelspin|
+McLaren|2021 McLaren Sabre|Hypercars|787 S1|UK|Seasonal|
+McLaren|2023 McLaren Artura|Modern Supercars|766 S1|UK|Autoshow, Wheelspin|
+Mercedes-AMG|2015 Mercedes-AMG GT S|Super GT|691 A|Germany|Autoshow, Wheelspin|
+Mercedes-AMG|2016 Mercedes-AMG C 63 S Coupé|Modern Super Saloons|645 A|Germany|Autoshow, Wheelspin|
+Mercedes-AMG|2017 Mercedes-AMG GT R|Super GT|764 S1|Germany|Seasonal|
+Mercedes-AMG|2018 Mercedes-AMG E 63 S|Modern Super Saloons|674 A|Germany|Autoshow, Wheelspin|
+Mercedes-AMG|2018 Mercedes-AMG GT 4-Door Coupé|Modern Super Saloons|664 A|Germany|Wheelspin, Seasonal|
+Mercedes-AMG|2020 Mercedes-AMG GT Black Series|Track Toys|782 S1|Germany|Autoshow, Wheelspin|
+Mercedes-AMG|2020 Mercedes-AMG GT Black Series Welcome Pack|Track Toys|900 S2|Germany|Autoshow DLC|Welcome Pack
+Mercedes-AMG|2020 Mercedes-AMG SLC 43 Final Edition|Modern Sports Cars|620 A|Germany|Autoshow, Wheelspin|
+Mercedes-AMG|2021 Mercedes-AMG Mercedes-AMG ONE|Hypercars|900 S2|Germany|Autoshow, Wheelspin|
+Mercedes-AMG|2021 Mercedes-AMG SL 63|GT Cars|690 A|Germany|Autoshow, Wheelspin|
+Mercedes-Benz|1954 Mercedes-Benz 300 SL Coupé|Rare Classics|388 D|Germany|Autoshow, Wheelspin|
+Mercedes-Benz|1955 Mercedes-Benz 300 SLR|Classic Racers|599 B|Germany|Autoshow, Wheelspin|
+Mercedes-Benz|1987 Mercedes-Benz AMG Hammer Coupe|Retro Super Saloons|565 B|Germany|Autoshow, Wheelspin|
+Mercedes-Benz|1990 Mercedes-Benz 190 E 2.5-16 Evolution II|Retro Super Saloons|460 C|Germany|Autoshow|
+Mercedes-Benz|1990 Mercedes-Benz 190 E 2.5-16 Evolution II Forza Edition|Track Toys|700 A|Germany|Wheelspin, Seasonal|
+Mercedes-Benz|1998 Mercedes-Benz AMG CLK GTR|Retro Supercars|713 S1|Germany|Wheelspin, Seasonal|
+Mercedes-Benz|2009 Mercedes-Benz SL 65 AMG Black Series|Super GT|699 A|Germany|Autoshow, Wheelspin|
+Mercedes-Benz|2012 Mercedes-Benz C 63 AMG Coupé Black Series|Modern Super Saloons|654 A|Germany|Autoshow|
+Mercedes-Benz|2013 Mercedes-Benz A 45 AMG|Super Hot Hatch|582 B|Germany|Autoshow, Wheelspin|
+Mercedes-Benz|2013 Mercedes-Benz G 65 AMG|Pickups & 4x4's|530 B|Germany|Autoshow, Collection Journal|
+Mercedes-Benz|2014 Mercedes-Benz G 63 AMG 6x6|Pickups & 4x4's|489 C|Germany|Wheelspin, Seasonal|
+Mercedes-Benz|2014 Mercedes-Benz Unimog U5023|Offroad|100 D|Germany|Autoshow, Wheelspin|
+Mercedes-Benz|2018 Mercedes-Benz X-Class|Pickups & 4x4's|258 D|Germany|Autoshow, Wheelspin|
+Meyers|1971 Meyers Manx|Buggies|201 D|USA|Autoshow, Wheelspin|
+Meyers|2023 Meyers Manx 2.0|Buggies|540 B|USA|Autoshow, Wheelspin|
+MG|1986 MG Metro 6R4|Rally Monsters|627 A|UK|Autoshow, Collection Journal, Wheelspin|
+MINI|1965 MINI Cooper S|Classic Rally|158 D|UK|Autoshow, Wheelspin|
+MINI|2012 MINI John Cooper Works GP|Hot Hatch|509 B|UK|Autoshow, Wheelspin|
+MINI|2013 MINI X-Raid All4 Racing Countryman|Offroad|523 B|UK|Autoshow, Wheelspin|
+MINI|2018 MINI X-raid John Cooper Works Buggy|Offroad|514 B|UK|Collection Journal, Seasonal|
+MINI|2021 MINI John Cooper Works GP|Super Hot Hatch|599 B|UK|Seasonal|
+Mitsubishi|1990 Mitsubishi #269 Attacking the Clock Racing Minicab Time Attack|Track Toys|166 D|Japan|Autoshow DLC|Time Attack Car Pack
+Mitsubishi|1992 Mitsubishi Galant VR-4|Retro Rally|431 C|Japan|Autoshow, Wheelspin|
+Mitsubishi|1995 Mitsubishi Eclipse GSX|Retro Sports Cars|436 C|Japan|Autoshow, Wheelspin|
+Mitsubishi|1995 Mitsubishi Lancer Evolution III GSR|Retro Rally|518 B|Japan|Collection Journal|
+Mitsubishi|1995 Mitsubishi Montero Exceed 2800 TD|Pickups & 4x4's|190 D|Japan|Autoshow, Wheelspin|
+Mitsubishi|1997 Mitsubishi GTO|Retro Sports Cars|495 C|Japan|Autoshow, Wheelspin|
+Mitsubishi|1997 Mitsubishi Montero Evolution|Pickups & 4x4's|346 D|Japan|Collection Journal|
+Mitsubishi|2001 Mitsubishi Lancer Evolution VI GSR TM Edition|Retro Rally|574 B|Japan|Autoshow|
+Mitsubishi|2004 Mitsubishi Lancer Evolution VIII MR|Modern Rally|555 B|Japan|Autoshow, Wheelspin|
+Mitsubishi|2004 Mitsubishi Lancer Evolution VIII MR Welcome Pack|Modern Rally|700 A|Japan|Autoshow DLC|Welcome Pack
+Mitsubishi|2005 Mitsubishi #1 Sierra Sierra Enterprises Lancer Evolution Time Attack|Extreme Track Toys|962 R|Japan|Collection Journal|
+Mitsubishi|2006 Mitsubishi Lancer Evolution IX MR|Modern Rally|521 B|Japan|Seasonal|
+Mitsubishi|2008 Mitsubishi Lancer Evolution X GSR|Modern Rally|534 B|Japan|Autoshow, Wheelspin|
+Nissan|1969 Nissan Fairlady Z 432|Classic Sports Cars|369 D|Japan|Autoshow, Wheelspin|
+Nissan|1971 Nissan Skyline 2000GT-R|Classic Sports Cars|380 D|Japan|Collection Journal|
+Nissan|1973 Nissan Skyline H/T 2000GT-R|Classic Sports Cars|407 C|Japan|Autoshow, Wheelspin|
+Nissan|1983 Nissan #11 Tomica Skyline Turbo Super Silhouette|Retro Racers|847 S2|Japan|Collection Journal|
+Nissan|1985 Nissan Safari Turbo|Pickups & 4x4's|123 D|Japan|Collection Journal|
+Nissan|1987 Nissan Be-1|Eclectic Domestics|175 D|Japan|Seasonal|
+Nissan|1987 Nissan Skyline GTS-R|Retro Sports Cars|432 C|Japan|Autoshow|
+Nissan|1989 Nissan PAO|Eclectic Domestics|145 D|Japan|Collection Journal|
+Nissan|1989 Nissan S-Cargo|Eclectic Domestics|131 D|Japan|Autoshow, Wheelspin|
+Nissan|1989 Nissan S-Cargo Forza Edition|Track Toys|800 S1|Japan|Wheelspin, Seasonal|
+Nissan|1989 Nissan Silvia K's|Retro Sports Cars|455 C|Japan|Autoshow|
+Nissan|1990 Nissan #12 Skyline GT-R (BNR32 Gr.A) JTC|Retro Racers|858 S2|Japan|Autoshow DLC|Car Pass
+Nissan|1990 Nissan Pulsar GTI-R|Retro Rally|486 C|Japan|Autoshow, Wheelspin|
+Nissan|1991 Nissan Figaro|Eclectic Domestics|234 D|Japan|Collection Journal|
+Nissan|1992 Nissan Skyline GT-R|Retro Sports Cars|541 B|Japan|Autoshow, Wheelspin|
+Nissan|1993 Nissan #32 Skyline WTAC 'Xtreme GTR'|Extreme Track Toys|923 R|Japan|Autoshow DLC|Time Attack Car Pack
+Nissan|1993 Nissan 240SX|Retro Sports Cars|339 D|Japan|Wheelspin, Seasonal|
+Nissan|1994 Nissan Fairlady Z Version S Twin Turbo|Retro Sports Cars|497 C|Japan|Autoshow|
+Nissan|1994 Nissan Silvia K's|Retro Sports Cars|499 C|Japan|Autoshow, Wheelspin|
+Nissan|1995 Nissan Gloria Gran Turismo|Retro Super Saloons|498 C|Japan|Autoshow, Wheelspin|
+Nissan|1995 Nissan NISMO GT-R LM|Retro Sports Cars|545 B|Japan|Autoshow, Wheelspin|
+Nissan|1997 Nissan Skyline GT-R V-Spec|Retro Sports Cars|555 B|Japan|Seasonal|
+Nissan|1997 Nissan Stagea RS Four V|Retro Super Saloons|439 C|Japan|Autoshow, Wheelspin|
+Nissan|1998 Nissan #23 Pennzoil NISMO Skyline GT-R|Retro Racers|848 S2|Japan|Collection Journal|
+Nissan|1998 Nissan R390 (GT1)|Retro Supercars|774 S1|Japan|Collection Journal|
+Nissan|1998 Nissan Silvia K's Aero|Retro Sports Cars|494 C|Japan|Autoshow, Wheelspin|
+Nissan|1998 Nissan Skyline GT-R 40th Anniversary|Retro Sports Cars|547 B|Japan|Autoshow DLC|Car Pass
+Nissan|2000 Nissan #36 Dream Project S15 Silvia WTAC|Extreme Track Toys|996 R|Japan|Autoshow DLC|Time Attack Car Pack
+Nissan|2000 Nissan Skyline GT-R V Spec II|Retro Sports Cars|590 B|Japan|Autoshow, Wheelspin|
+Nissan|2002 Nissan Silvia Spec-R|Retro Sports Cars|551 B|Japan|Autoshow, Wheelspin|
+Nissan|2003 Nissan Fairlady Z|Retro Sports Cars|534 B|Japan|Autoshow, Wheelspin|
+Nissan|2010 Nissan 370Z|Modern Sports Cars|568 B|Japan|Seasonal|
+Nissan|2012 Nissan GT-R Black Edition (R35)|Modern Supercars|703 S1|Japan|Autoshow, Wheelspin|
+Nissan|2012 Nissan GT-R Black Edition (R35) Forza Edition|Extreme Track Toys|850 S2|Japan|Wheelspin, Seasonal|
+Nissan|2017 Nissan GT-R (R35)|Modern Supercars|709 S1|Japan|Autoshow, Wheelspin|
+Nissan|2019 Nissan 370Z Nismo|Modern Sports Cars|603 A|Japan|Autoshow, Wheelspin|
+Nissan|2020 Nissan GT-R NISMO (R35)|Track Toys|736 S1|Japan|Autoshow, Wheelspin|
+Nissan|2024 Nissan GT-R Nismo|Track Toys|741 S1|Japan|Autoshow, Collection Journal|
+Nissan|2024 Nissan Z NISMO|Modern Sports Cars|652 A|Japan|Autoshow, Wheelspin|
+Noble|2010 Noble M600|Modern Supercars|793 S1|UK|Autoshow, Wheelspin|
+Opel|1984 Opel Manta 400|Rally Monsters|576 B|Germany|Autoshow, Collection Journal|
+Pagani|2009 Pagani Zonda R|Extreme Track Toys|918 R|Italy|Autoshow, Wheelspin|
+Pagani|2010 Pagani Zonda Cinque Roadster|Hypercars|812 S2|Italy|Autoshow|
+Pagani|2016 Pagani Huayra BC Coupe|Hypercars|851 S2|Italy|Autoshow, Wheelspin|
+Pagani|2021 Pagani Huayra R|Extreme Track Toys|954 R|Italy|Seasonal|
+Peel|1962 Peel P50|Cult Cars|100 D|UK|Autoshow, Wheelspin|
+Peel|1962 Peel P50 Trolli Edition|Cult Cars|100 D|UK|Autoshow DLC|Partnership DLC
+Penhall|2011 Penhall The Cholla|Unlimited Buggies|541 B|USA|Autoshow, Wheelspin|
+Peugeot|1984 Peugeot 205 Turbo 16|Retro Rally|500 C|France|Collection Journal|
+Peugeot|1991 Peugeot 205 Rallye|Retro Hot Hatch|350 D|France|Autoshow, Wheelspin|
+Peugeot|2007 Peugeot 207 Super 2000|Rally Monsters|632 A|France|Seasonal|
+Plymouth|1958 Plymouth Fury|Rods and Customs|361 D|USA|Autoshow, Wheelspin|
+Plymouth|1968 Plymouth Barracuda Formula S|Classic Muscle|445 C|USA|Autoshow, Wheelspin|
+Plymouth|1971 Plymouth Cuda 426 HEMI|Classic Muscle|441 C|USA|Autoshow, Wheelspin|
+Polaris|2021 Polaris RZR Pro XP Factory Racing Limited Edition|UTV's|439 C|USA|Autoshow, Wheelspin|
+Polaris|2021 Polaris RZR Pro XP Ultimate|UTV's|496 C|USA|Autoshow, Collection Journal|
+Pontiac|1977 Pontiac Firebird Trans Am|Classic Muscle|312 D|USA|Autoshow, Wheelspin|
+Pontiac|1987 Pontiac Firebird Trans Am GTA|Retro Muscle|382 D|USA|Autoshow, Wheelspin|
+Porsche|1970 Porsche #3 917 LH|Classic Racers|777 S1|Germany|Autoshow, Collection Journal|
+Porsche|1970 Porsche #3 917 LH Forza Edition|Extreme Track Toys|998 R|Germany|Wheelspin, Seasonal|
+Porsche|1973 Porsche 911 Carrera RS|Rare Classics|490 C|Germany|Autoshow, Wheelspin|
+Porsche|1982 Porsche 911 Turbo 3.3|Retro Supercars|550 B|Germany|Collection Journal|
+Porsche|1985 Porsche #185 959 Prodrive Rally Raid|Rally Monsters|623 A|Germany|Autoshow, Wheelspin|
+Porsche|1987 Porsche 959|Retro Supercars|661 A|Germany|Collection Journal|
+Porsche|1989 Porsche 944 Turbo|Retro Sports Cars|539 B|Germany|Autoshow, Wheelspin|
+Porsche|1993 Porsche 911 Turbo S Leichtbau|Retro Sports Cars|652 A|Germany|Seasonal|
+Porsche|1993 Porsche 928 GTS|Retro Sports Cars|563 B|Germany|Autoshow, Wheelspin|
+Porsche|1993 Porsche 968 Turbo S|Retro Sports Cars|594 B|Germany|Autoshow, Wheelspin|
+Porsche|1995 Porsche 911 GT2|Retro Supercars|644 A|Germany|Wheelspin, Seasonal|
+Porsche|1997 Porsche 911 GT1 Strassenversion|Retro Supercars|746 S1|Germany|Autoshow, Wheelspin|
+Porsche|2003 Porsche Carrera GT|Retro Supercars|758 S1|Germany|Collection Journal, Seasonal|
+Porsche|2004 Porsche 911 GT3|Retro Supercars|674 A|Germany|Autoshow, Wheelspin|
+Porsche|2005 Porsche Cayman GT3 WTAC|Extreme Track Toys|856 S2|Germany|Autoshow, Wheelspin|
+Porsche|2012 Porsche 911 GT3 RS 4.0|Track Toys|726 S1|Germany|Autoshow, Collection Journal|
+Porsche|2014 Porsche 918 Spyder|Hypercars|858 S2|Germany|Autoshow, Collection Journal|
+Porsche|2018 Porsche 718 Cayman GTS|Modern Sports Cars|675 A|Germany|Autoshow, Wheelspin|
+Porsche|2018 Porsche 911 GT2 RS|Track Toys|803 S2|Germany|Autoshow, Wheelspin|
+Porsche|2018 Porsche Cayenne Turbo|Sports Utility Heroes|638 A|Germany|Autoshow, Wheelspin|
+Porsche|2018 Porsche Macan LPR Rally Raid|Offroad|528 B|Germany|Autoshow, Wheelspin|
+Porsche|2019 Porsche #70 Porsche Motorsport 935|Extreme Track Toys|853 S2|Germany|Autoshow, Wheelspin|
+Porsche|2019 Porsche 911 Carrera S|Modern Sports Cars|714 S1|Germany|Autoshow, Wheelspin|
+Porsche|2019 Porsche 911 GT3 RS|Track Toys|760 S1|Germany|Wheelspin, Seasonal|
+Porsche|2020 Porsche Taycan Turbo S|Modern Super Saloons|725 S1|Germany|Autoshow, Wheelspin|
+Porsche|2021 Porsche 911 GT3|Track Toys|752 S1|Germany|Autoshow, Wheelspin|
+Porsche|2021 Porsche Mission R|Extreme Track Toys|865 S2|Germany|Autoshow, Wheelspin|
+Porsche|2022 Porsche 718 Cayman GT4 RS|Track Toys|737 S1|Germany|Autoshow, Collection Journal|
+Porsche|2023 Porsche 911 GT3 RS|Track Toys|758 S1|Germany|Autoshow, Wheelspin|
+Porsche|2023 Porsche 911 Rallye|Rally Monsters|700 A|Germany|Seasonal|
+Porsche|2023 Porsche 911 Turbo S|Modern Supercars|774 S1|Germany|Autoshow, Wheelspin|
+Radical|2015 Radical RXC Turbo|Extreme Track Toys|842 S2|UK|Autoshow, Wheelspin|
+Ram|2024 Ram 1500 TRX|Pickups & 4x4's|514 B|USA|Autoshow|
+Reliant|1972 Reliant Supervan III|Utility Heroes|100 D|UK|Autoshow, Wheelspin|
+Renault|1967 Renault 8 Gordini|Classic Rally|322 D|France|Seasonal|
+Renault|1980 Renault 5 Turbo|Retro Rally|417 C|France|Autoshow, Wheelspin|
+Renault|1993 Renault Clio Williams|Retro Hot Hatch|400 D|France|Autoshow, Wheelspin|
+Renault|2008 Renault Mégane R26.R|Hot Hatch|561 B|France|Autoshow, Wheelspin|
+Renault|2010 Renault Megane RS 250|Super Hot Hatch|538 B|France|Autoshow, Wheelspin|
+Renault|2018 Renault Megane R.S.|Super Hot Hatch|547 B|France|Autoshow, Wheelspin|
+Rimac|2021 Rimac Nevera|Hypercars|913 R|Croatia|Wheelspin, Seasonal|
+Rivian|2022 Rivian R1T|Pickups & 4x4's|607 A|USA|Autoshow, Wheelspin|
+RJ Anderson|2016 RJ Anderson #37 Polaris RZR Pro 2 Truck|Unlimited Offroad|674 A|USA|Autoshow, Collection Journal|
+RJ Anderson|2021 RJ Anderson #37 Polaris RZR Pro 4 Truck|Unlimited Offroad|677 A|USA|Wheelspin, Seasonal|
+Saleen|2017 Saleen S7 LM|Extreme Track Toys|835 S2|USA|Seasonal|
+Schuppan|1993 Schuppan 962CR|Retro Supercars|764 S1|UK|Seasonal|
+Shelby|1965 Shelby Cobra 427 S/C|Rare Classics|582 B|USA|Collection Journal, Seasonal|
+Shelby|1965 Shelby Cobra Daytona Coupe|Classic Racers|515 B|USA|Autoshow, Wheelspin|
+SIERRA Cars|2020 SIERRA Cars #23 Yokohama ALPHA|Extreme Track Toys|926 R|USA|Autoshow, Wheelspin|
+SIERRA Cars|2021 SIERRA Cars 700R|UTV's|346 D|USA|Autoshow, Wheelspin|
+SIERRA Cars|2021 SIERRA Cars RX3|UTV's|635 A|USA|Autoshow, Wheelspin|
+SRT|2013 SRT Viper GTS|Modern Muscle|707 S1|USA|Autoshow, Wheelspin, Loyalty|
+Subaru|1980 Subaru BRAT GL|Utility Heroes|159 D|Japan|Autoshow, Wheelspin|
+Subaru|1990 Subaru LEGACY RS|Retro Rally|406 C|Japan|Autoshow, Wheelspin|
+Subaru|1994 Subaru Vivio RX-R|Eclectic Domestics|281 D|Japan|Autoshow, Wheelspin|
+Subaru|1994 Subaru Vivio RX-R Forza Edition|Extreme Track Toys|900 S2|Japan|Collection Journal, Seasonal|
+Subaru|1996 Subaru SVX|Retro Sports Cars|466 C|Japan|Autoshow, Wheelspin|
+Subaru|1998 Subaru Impreza 22B-STi Version|Retro Rally|600 B|Japan|Autoshow, Wheelspin|
+Subaru|2004 Subaru IMPREZA WRX STI|Modern Rally|552 B|Japan|Autoshow, Wheelspin|
+Subaru|2005 Subaru IMPREZA WRX STI|Modern Rally|570 B|Japan|Autoshow, Wheelspin|
+Subaru|2005 Subaru LEGACY B4 2.0 GT|Retro Super Saloons|549 B|Japan|Autoshow, Wheelspin|
+Subaru|2008 Subaru IMPREZA WRX STI|Modern Rally|539 B|Japan|Autoshow, Wheelspin|
+Subaru|2011 Subaru WRX STI|Modern Rally|547 B|Japan|Autoshow, Wheelspin|
+Subaru|2013 Subaru BRZ|Modern Sports Cars|463 C|Japan|Autoshow, Wheelspin|
+Subaru|2015 Subaru WRX STI|Modern Rally|555 B|Japan|Autoshow, Wheelspin|
+Subaru|2018 Subaru WRX STI ARX Supercar|Rally Monsters|757 S1|Japan|Seasonal|
+Subaru|2019 Subaru STI S209|Modern Rally|574 B|Japan|Seasonal|
+Subaru|2022 Subaru BRZ|Modern Sports Cars|551 B|Japan|Autoshow, Wheelspin|
+Subaru|2022 Subaru BRZ Forza Edition|Unlimited Offroad|700 A|Japan|Aftermarket|
+Subaru|2022 Subaru WRX|Modern Rally|538 B|Japan|Autoshow, Wheelspin|
+Toyota|1965 Toyota Sports 800|Classic Sports Cars|141 D|Japan|Collection Journal, Wheelspin, Seasonal|
+Toyota|1965 Toyota Sports 800 Fanta Edition|Classic Sports Cars|141 D|Japan|Autoshow DLC|Partnership DLC
+Toyota|1969 Toyota 2000GT|Rare Classics|377 D|Japan|Collection Journal|
+Toyota|1974 Toyota Corolla SR5|Classic Sports Cars|197 D|Japan|Seasonal|
+Toyota|1979 Toyota FJ40|Pickups & 4x4's|157 D|Japan|Autoshow, Wheelspin|
+Toyota|1985 Toyota Sprinter Trueno GT Apex|Retro Sports Cars|376 D|Japan|Autoshow, Wheelspin|
+Toyota|1985 Toyota Sprinter Trueno GT Apex Forza Edition|Track Toys|600 B|Japan|Collection Journal, Seasonal|
+Toyota|1989 Toyota MR2 SC|Retro Sports Cars|397 D|Japan|Seasonal|
+Toyota|1991 Toyota Chaser GT Twin Turbo|Retro Super Saloons|484 C|Japan|Autoshow, Wheelspin|
+Toyota|1991 Toyota Sera|Eclectic Domestics|344 D|Japan|Autoshow, Wheelspin|
+Toyota|1992 Toyota Celica GT-Four RC ST185|Retro Rally|438 C|Japan|Autoshow|
+Toyota|1992 Toyota Supra 2.0 GT|Retro Sports Cars|453 C|Japan|Autoshow, Wheelspin|
+Toyota|1993 Toyota #1 T100 Baja Truck|Unlimited Offroad|584 B|Japan|Autoshow, Wheelspin|
+Toyota|1994 Toyota Celica GT-Four ST205|Retro Rally|479 C|Japan|Autoshow, Wheelspin|
+Toyota|1995 Toyota J&J Motorsport Supra WTAC|Extreme Track Toys|828 S2|Japan|Autoshow DLC|Time Attack Car Pack
+Toyota|1995 Toyota MR2 GT|Retro Sports Cars|522 B|Japan|Autoshow, Wheelspin|
+Toyota|1996 Toyota Starlet Glanza V|Retro Hot Hatch|435 C|Japan|Seasonal|
+Toyota|1997 Toyota Chaser 2.5 Tourer V|Retro Super Saloons|504 B|Japan|Autoshow, Collection Journal|
+Toyota|1997 Toyota Soarer 2.5 GT-T|Retro Sports Cars|491 C|Japan|Autoshow, Collection Journal, Wheelspin|
+Toyota|1998 Toyota Supra RZ|Retro Sports Cars|529 B|Japan|Autoshow, Collection Journal, Wheelspin|
+Toyota|1999 Toyota Altezza RS200 Z EDITION|Retro Super Saloons|461 C|Japan|Seasonal|
+Toyota|2003 Toyota Celica Sport Specialty II|Retro Sports Cars|433 C|Japan|Autoshow, Wheelspin|
+Toyota|2005 Toyota Crown Super Deluxe Taxi|Retro Super Saloons|181 D|Japan|Autoshow, Wheelspin|
+Toyota|2013 Toyota 86|Modern Sports Cars|460 C|Japan|Autoshow, Wheelspin|
+Toyota|2013 Toyota 86 Stories|Track Toys|685 A|Japan|Collection Journal, Seasonal|
+Toyota|2016 Toyota Land Cruiser Arctic Trucks AT37|Pickups & 4x4's|332 D|Japan|Seasonal|
+Toyota|2017 Toyota JPN Taxi|Eclectic Domestics|248 D|Japan|Autoshow, Wheelspin|
+Toyota|2019 Toyota 4Runner TRD Pro|Pickups & 4x4's|421 C|Japan|Autoshow, Wheelspin|
+Toyota|2019 Toyota Tacoma TRD Pro|Pickups & 4x4's|409 C|Japan|Autoshow, Wheelspin|
+Toyota|2019 Toyota Tacoma TRD Pro Forza Edition|Extreme Track Toys|998 R|Japan|Autoshow DLC|VIP
+Toyota|2020 Toyota GR Supra|Modern Sports Cars|616 A|Japan|Autoshow, Collection Journal, Wheelspin|
+Toyota|2021 Toyota GR Yaris|Modern Rally|558 B|Japan|Autoshow, Wheelspin|
+Toyota|2022 Toyota GR86|Modern Sports Cars|556 B|Japan|Autoshow, Wheelspin|
+Toyota|2023 Toyota Camry TRD|Modern Super Saloons|525 B|Japan|Autoshow|
+Toyota|2023 Toyota GR Corolla|Super Hot Hatch|596 B|Japan|Autoshow DLC|Car Pass
+Toyota|2025 Toyota Land Cruiser|Sports Utility Heroes|456 C|Japan|Autoshow, Wheelspin|
+TVR|1998 TVR Cerbera Speed 12|Retro Supercars|770 S1|UK|Seasonal|
+TVR|2005 TVR Sagaris|Retro Sports Cars|672 A|UK|Autoshow, Wheelspin|
+TVR|2018 TVR Griffith|Modern Sports Cars|729 S1|UK|Autoshow|
+Ultima|2015 Ultima Evolution Coupe 1020|Extreme Track Toys|925 R|UK|Autoshow, Wheelspin|
+Volkswagen|1963 Volkswagen Beetle|Cult Cars|100 D|Germany|Autoshow, Wheelspin|
+Volkswagen|1963 Volkswagen Type 2 De Luxe|Cult Cars|100 D|Germany|Autoshow, Collection Journal|
+Volkswagen|1969 Volkswagen Class 5/1600 Baja Bug|Buggies|260 D|Germany|Autoshow, Wheelspin|
+Volkswagen|1982 Volkswagen Pickup LX|Utility Heroes|100 D|Germany|Autoshow, Wheelspin|
+Volkswagen|1983 Volkswagen Golf GTI|Retro Hot Hatch|314 D|Germany|Autoshow, Wheelspin|
+Volkswagen|1989 Volkswagen Rallye Golf|Retro Rally|440 C|Germany|Seasonal|
+Volkswagen|1992 Volkswagen Golf Gti 16v Mk2|Retro Hot Hatch|308 D|Germany|Autoshow, Wheelspin|
+Volkswagen|1995 Volkswagen Corrado VR6|Retro Hot Hatch|426 C|Germany|Autoshow, Wheelspin|
+Volkswagen|2010 Volkswagen Golf R|Super Hot Hatch|526 B|Germany|Autoshow, Wheelspin|
+Volkswagen|2011 Volkswagen Scirocco R|Hot Hatch|548 B|Germany|Autoshow, Wheelspin|
+Volkswagen|2014 Volkswagen Golf R|Super Hot Hatch|536 B|Germany|Autoshow, Wheelspin|
+Volkswagen|2017 Volkswagen #34 Andretti Rally Cross Beetle|Rally Monsters|764 S1|Germany|Autoshow, Wheelspin|
+Volkswagen|2021 Volkswagen Golf R|Super Hot Hatch|546 B|Germany|Autoshow, Wheelspin|
+Volkswagen|2022 Volkswagen Golf R|Super Hot Hatch|548 B|Germany|Autoshow, Wheelspin|
+Volvo|1983 Volvo 242 Turbo Evolution|Classic Rally|435 C|Sweden|Autoshow, Wheelspin|
+Wuling|2013 Wuling Sunshine S|Utility Heroes|107 D|China|Autoshow, Wheelspin|
+Wuling|2013 Wuling Sunshine S Forza Edition|Track Toys|800 S1|China|Wheelspin, Seasonal|
+Wuling|2022 Wuling Hongguang Mini EV|Hot Hatch|100 D|China|Autoshow, Wheelspin|
+Zenvo|2019 Zenvo TSR-S|Hypercars|906 R|Denmark|Autoshow, Wheelspin|
+`;
+
+/* ======================= PARSING ======================= */
+const CLASS_ORDER = { 'D':1, 'C':2, 'B':3, 'A':4, 'S1':5, 'S2':6, 'R':7, 'X':8 };
+const PRICE_KEY = 'fh6_prices_v1';
+
+function parseClass(s){
+  // es. "734 S1" -> {pi:734, cls:'S1'}
+  const m = s.trim().match(/^(\d+)\s+(\S+)$/);
+  if(m) return { pi: parseInt(m[1],10), cls: m[2] };
+  return { pi: 0, cls: s.trim() };
+}
+
+const cars = RAW.split('\n')
+  .map(l => l.trim())
+  .filter(l => l.length)
+  .map((line, i) => {
+    const f = line.split('|');
+    const c = parseClass(f[3] || '');
+    return {
+      id: i,
+      key: (f[0]||'') + '|' + (f[1]||''),
+      make: f[0]||'', name: f[1]||'', type: f[2]||'',
+      classFull: f[3]||'', pi: c.pi, cls: c.cls,
+      country: f[4]||'', collection: f[5]||'', dlc: (f[6]||'').trim()
+    };
+  });
+
+/* Prezzi di default INCORPORATI nell'app (permanenti, validi anche online).
+   Chiave = "Marca|Nome". Riempiti dal CSV compilato. Esempio:
+   "Abarth|1968 Abarth 595 esseesse": { price: 25000, priceDisc: 22500 } */
+const DEFAULT_PRICES = {
+  "Abarth|1968 Abarth 595 esseesse": {price: 25000, priceDisc: 23750},
+  "Abarth|1980 Abarth Fiat 131": {price: 125000, priceDisc: 118750},
+  "Abarth|2016 Abarth 695 Biposto": {price: 250000},
+  "Acura|2001 Acura Integra Type R": {price: 65000, priceDisc: 61750},
+  "Acura|2002 Acura RSX Type S": {price: 18000, priceDisc: 17100},
+  "Acura|2022 Acura NSX Type S": {price: 193000, priceDisc: 183350},
+  "Acura|2023 Acura Integra A-Spec": {price: 36000, priceDisc: 34200},
+  "Alfa Romeo|1965 Alfa Romeo Giulia Sprint GTA Stradale": {price: 343000, priceDisc: 325850},
+  "Alfa Romeo|1965 Alfa Romeo Giulia TZ2": {price: 1200000},
+  "Alfa Romeo|1968 Alfa Romeo 33 Stradale": {price: 3500000, priceDisc: 3325000},
+  "Alfa Romeo|1992 Alfa Romeo 155 Q4": {price: 30000, priceDisc: 28500},
+  "Alfa Romeo|2007 Alfa Romeo 8C Competizione": {price: 312000, priceDisc: 296400},
+  "Alfa Romeo|2014 Alfa Romeo 4C": {price: 73000, priceDisc: 69350},
+  "Alfa Romeo|2017 Alfa Romeo Giulia Quadrifoglio": {price: 45000, priceDisc: 42750},
+  "Alumicraft|2015 Alumicraft Class 10 Race Car": {price: 45000, priceDisc: 42750},
+  "Alumicraft|2021 Alumicraft #122 Class 1 Buggy": {price: 160000, priceDisc: 152000},
+  "Alumicraft|2022 Alumicraft #6165 Trick Truck": {price: 300000, priceDisc: 285000},
+  "AMG Transport Dynamics|2554 AMG Transport Dynamics M12S Warthog CST": {price: 850000, priceDisc: 807500},
+  "Apollo|2019 Apollo Intensa Emozione": {price: 3200000},
+  "Ariel|2013 Ariel Atom 500 V8": {price: 190000, priceDisc: 180500},
+  "Ariel|2016 Ariel Nomad": {price: 54000, priceDisc: 51300},
+  "Aston Martin|1964 Aston Martin DB5": {price: 500000, priceDisc: 475000},
+  "Aston Martin|2016 Aston Martin Vulcan": {price: 2300000, priceDisc: 2185000},
+  "Aston Martin|2017 Aston Martin DB11": {price: 175000, priceDisc: 166250},
+  "Aston Martin|2017 Aston Martin Vulcan AMR Pro": {price: 3000000, priceDisc: 2850000},
+  "Aston Martin|2019 Aston Martin DBS Superleggera": {price: 275000},
+  "Aston Martin|2019 Aston Martin Valhalla Concept Car": {price: 1150000},
+  "Aston Martin|2019 Aston Martin Vantage": {price: 250000, priceDisc: 237500},
+  "Aston Martin|2021 Aston Martin DBX": {price: 237500},
+  "Aston Martin|2022 Aston Martin Valkyrie AMR Pro": {price: 4200000, priceDisc: 3990000},
+  "Aston Martin|2023 Aston Martin Valkyrie": {price: 2750000, priceDisc: 2612500},
+  "Audi|1984 Audi Sport quattro": {price: 650000, priceDisc: 617500},
+  "Audi|1986 Audi #2 Audi Sport quattro S1": {price: 750000, priceDisc: 712500},
+  "Audi|2001 Audi RS 4 Avant": {price: 175000, priceDisc: 166250},
+  "Audi|2003 Audi RS 6": {price: 35000, priceDisc: 33250},
+  "Audi|2006 Audi RS 4": {price: 75000, priceDisc: 71250},
+  "Audi|2009 Audi R8 LMS": {price: 900000, priceDisc: 855000},
+  "Audi|2009 Audi RS 6": {price: 42000, priceDisc: 39900},
+  "Audi|2010 Audi TT RS Coupé": {price: 35000, priceDisc: 33250},
+  "Audi|2011 Audi RS 3 Sportback": {price: 20000, priceDisc: 19000},
+  "Audi|2011 Audi RS 5 Coupé": {price: 25000, priceDisc: 23750},
+  "Audi|2013 Audi R8 Coupé V10 plus 5.2 FSI quattro": {price: 100000},
+  "Audi|2013 Audi RS 4 Avant": {price: 30000, priceDisc: 28500},
+  "Audi|2013 Audi RS 7 Sportback": {price: 55000, priceDisc: 52250},
+  "Audi|2015 Audi RS 6 Avant": {price: 60000, priceDisc: 57000},
+  "Audi|2015 Audi S1": {price: 21000, priceDisc: 19950},
+  "Audi|2016 Audi R8 V10 plus": {price: 160000, priceDisc: 152000},
+  "Audi|2018 Audi RS 4 Avant": {price: 50000, priceDisc: 47500},
+  "Audi|2020 Audi R8 V10 performance": {price: 281000, priceDisc: 266950},
+  "Audi|2020 Audi RS 3 Sedan": {price: 52000, priceDisc: 49400},
+  "Audi|2021 Audi RS 6 Avant": {price: 83000, priceDisc: 78850},
+  "Audi|2021 Audi RS 7 Sportback": {price: 80000, priceDisc: 76000},
+  "Audi|2021 Audi RS e-tron GT": {price: 95000, priceDisc: 90250},
+  "Austin-Healey|1965 Austin-Healey 3000 MkIII": {price: 75000, priceDisc: 71250},
+  "Autozam|1993 Autozam AZ-1": {price: 38000, priceDisc: 36100},
+  "BAC|2014 BAC Mono": {price: 196000, priceDisc: 186200},
+  "Bentley|2016 Bentley Bentayga": {price: 250000},
+  "Bentley|2021 Bentley Continental GT Convertible": {price: 170000, priceDisc: 161500},
+  "BMW|1957 BMW Isetta 300 Export": {price: 84000, priceDisc: 79800},
+  "BMW|1973 BMW 2002 Turbo": {price: 127000, priceDisc: 120650},
+  "BMW|1981 BMW M1": {price: 570000},
+  "BMW|1988 BMW M3": {price: 250000, priceDisc: 237500},
+  "BMW|1988 BMW M5": {price: 70000, priceDisc: 66500},
+  "BMW|1995 BMW 850CSi": {price: 135000, priceDisc: 128250},
+  "BMW|1995 BMW M5": {price: 48000, priceDisc: 45600},
+  "BMW|1997 BMW M3": {price: 30000, priceDisc: 28500},
+  "BMW|2003 BMW M5": {price: 47000, priceDisc: 44650},
+  "BMW|2005 BMW M3": {price: 35000, priceDisc: 33250},
+  "BMW|2008 BMW M3": {price: 43000, priceDisc: 40850},
+  "BMW|2008 BMW Z4 M Coupé": {price: 63000, priceDisc: 59850},
+  "BMW|2009 BMW M5": {price: 54000, priceDisc: 51300},
+  "BMW|2010 BMW M3 GTS": {price: 198000, priceDisc: 188100},
+  "BMW|2011 BMW X5 M": {price: 24000, priceDisc: 22800},
+  "BMW|2012 BMW M5": {price: 40000, priceDisc: 38000},
+  "BMW|2014 BMW M4 Coupé": {price: 55000, priceDisc: 52250},
+  "BMW|2015 BMW i8": {price: 70000, priceDisc: 66500},
+  "BMW|2016 BMW M4 GTS": {price: 125000, priceDisc: 118750},
+  "BMW|2019 BMW Z4 Roadster": {price: 38000, priceDisc: 36100},
+  "BMW|2020 BMW M2 Competition Coupé": {price: 237500},
+  "BMW|2020 BMW M8 Competition Coupé": {price: 100000, priceDisc: 95000},
+  "BMW|2021 BMW M4 Competition Coupé": {price: 64000, priceDisc: 60800},
+  "BMW|2021 BMW M4 Competition Coupé Welcome Pack": {price: 150000, priceDisc: 142500},
+  "BMW|2022 BMW iX xDrive50": {price: 37000, priceDisc: 35150},
+  "BMW|2022 BMW M5 CS": {price: 150000, priceDisc: 142500},
+  "BMW|2023 BMW M2": {price: 67000, priceDisc: 63650},
+  "BMW|2023 BMW M2 Forza Edition": {price: 500000},
+  "BMW|2024 BMW X6 M Competition": {price: 140000, priceDisc: 133000},
+  "Buick|1987 Buick Regal GNX": {price: 255000, priceDisc: 242250},
+  "Cadillac|2013 Cadillac XTS Limousine": {price: 44000, priceDisc: 41800},
+  "Cadillac|2016 Cadillac ATS-V": {price: 41000, priceDisc: 38950},
+  "Cadillac|2016 Cadillac CTS-V Sedan": {price: 60000, priceDisc: 57000},
+  "Cadillac|2022 Cadillac CT4-V Blackwing": {price: 55000, priceDisc: 52250},
+  "Cadillac|2022 Cadillac CT5-V Blackwing": {price: 90000, priceDisc: 85500},
+  "Can-Am|2018 Can-Am Maverick X RS Turbo R": {price: 16000, priceDisc: 15200},
+  "Casey Currie Motorsports|2019 Casey Currie Motorsports #4402 Ultra 4 'Trophy Jeep'": {price: 250000},
+  "Chevrolet|1953 Chevrolet Corvette": {price: 269000, priceDisc: 255550},
+  "Chevrolet|1955 Chevrolet 150 Utility Sedan": {price: 140000, priceDisc: 133000},
+  "Chevrolet|1957 Chevrolet Bel Air": {price: 69000, priceDisc: 65550},
+  "Chevrolet|1960 Chevrolet Corvette": {price: 250000},
+  "Chevrolet|1964 Chevrolet Impala Super Sport 409": {price: 70000, priceDisc: 66500},
+  "Chevrolet|1967 Chevrolet Corvette Stingray 427": {price: 135000},
+  "Chevrolet|1969 Chevrolet Camaro Super Sport Coupe": {price: 75000, priceDisc: 71250},
+  "Chevrolet|1969 Chevrolet Nova Super Sport 396": {price: 40000, priceDisc: 38000},
+  "Chevrolet|1970 Chevrolet Camaro Z28": {price: 36000, priceDisc: 34200},
+  "Chevrolet|1970 Chevrolet Chevelle Super Sport 454": {price: 90000, priceDisc: 85500},
+  "Chevrolet|1970 Chevrolet Corvette ZR-1": {price: 250000, priceDisc: 237500},
+  "Chevrolet|1970 Chevrolet El Camino Super Sport 454": {price: 55000, priceDisc: 52250},
+  "Chevrolet|1972 Chevrolet K-10 Custom": {price: 49000, priceDisc: 46550},
+  "Chevrolet|1979 Chevrolet Camaro Z28": {price: 20000, priceDisc: 19000},
+  "Chevrolet|1988 Chevrolet Monte Carlo Super Sport": {price: 30000, priceDisc: 28500},
+  "Chevrolet|1995 Chevrolet Corvette ZR-1": {price: 76000, priceDisc: 72200},
+  "Chevrolet|1996 Chevrolet Impala Super Sport": {price: 30000, priceDisc: 28500},
+  "Chevrolet|2002 Chevrolet Corvette Z06": {price: 33000, priceDisc: 31350},
+  "Chevrolet|2009 Chevrolet Corvette ZR1": {price: 125000, priceDisc: 118750},
+  "Chevrolet|2015 Chevrolet Camaro Z/28": {price: 65000, priceDisc: 61750},
+  "Chevrolet|2015 Chevrolet Corvette Z06": {price: 100000, priceDisc: 95000},
+  "Chevrolet|2017 Chevrolet Camaro ZL1": {price: 55000, priceDisc: 52250},
+  "Chevrolet|2018 Chevrolet Camaro ZL1 1LE": {price: 70000, priceDisc: 66500},
+  "Chevrolet|2019 Chevrolet Corvette ZR1": {price: 250000},
+  "Chevrolet|2020 Chevrolet Corvette Stingray Coupe": {price: 65000, priceDisc: 61750},
+  "Chevrolet|2020 Chevrolet Silverado LT Trail Boss": {price: 43000, priceDisc: 40850},
+  "Chevrolet|2023 Chevrolet Corvette Z06": {price: 155000, priceDisc: 147250},
+  "Chevrolet|2024 Chevrolet Corvette E-Ray": {price: 114000, priceDisc: 108300},
+  "Datsun|1969 Datsun 2000 Roadster": {price: 250000},
+  "Datsun|1970 Datsun 510": {price: 86000, priceDisc: 81700},
+  "Datsun|1972 Datsun #269 Attacking the Clock Racing 240Z 'All Carbon Hill Climb Beast'": {price: 185000, priceDisc: 175750},
+  "DeBerti|2013 DeBerti Jeep Wrangler Unlimited": {price: 150000, priceDisc: 142500},
+  "DeBerti|2018 DeBerti Chevrolet Silverado 1500 Drift Truck": {price: 250000, priceDisc: 237500},
+  "DeBerti|2019 DeBerti Ford Super Duty F-250 Lariat 'Transformer'": {price: 275000, priceDisc: 261250},
+  "DeBerti|2019 DeBerti Toyota Tacoma TRD 'The Performance Truck'": {price: 250000, priceDisc: 237500},
+  "DeLorean|1982 DeLorean DMC-12": {price: 72000, priceDisc: 68400},
+  "Dodge|1968 Dodge Dart HEMI Super Stock": {price: 300000},
+  "Dodge|1969 Dodge Charger Daytona HEMI": {price: 541000, priceDisc: 513950},
+  "Dodge|1969 Dodge Charger R/T": {price: 212800},
+  "Dodge|1970 Dodge Challenger R/T": {price: 525000},
+  "Dodge|1970 Dodge Coronet Super Bee": {price: 175000, priceDisc: 166250},
+  "Dodge|1999 Dodge Viper GTS ACR": {price: 68000, priceDisc: 64600},
+  "Dodge|1999 Dodge Viper GTS ACR Forza Edition": {price: 475000},
+  "Dodge|2006 Dodge Ram SRT-10": {price: 237500},
+  "Dodge|2008 Dodge Viper SRT-10 ACR": {price: 115000, priceDisc: 109250},
+  "Dodge|2015 Dodge Challenger SRT Hellcat": {price: 53000, priceDisc: 50350},
+  "Dodge|2015 Dodge Charger SRT Hellcat": {price: 44000, priceDisc: 41800},
+  "Dodge|2016 Dodge Viper ACR": {price: 290000},
+  "Dodge|2018 Dodge Challenger SRT Demon": {price: 90000, priceDisc: 85500},
+  "Dodge|2021 Dodge Durango SRT Hellcat": {price: 73000},
+  "Dodge|2022 Dodge Challenger SRT Super Stock": {price: 87000, priceDisc: 82650},
+  "Ferrari|1962 Ferrari 250 GT Berlinetta Lusso": {price: 1400000, priceDisc: 1330000},
+  "Ferrari|1962 Ferrari 250 GTO": {price: 48000000, priceDisc: 45600000},
+  "Ferrari|1967 Ferrari #24 Ferrari Spa 330 P4": {price: 70000000, priceDisc: 66500000},
+  "Ferrari|1969 Ferrari Dino 246 GT": {price: 390000, priceDisc: 370500},
+  "Ferrari|1970 Ferrari 512 S": {price: 3600000, priceDisc: 3420000},
+  "Ferrari|1984 Ferrari 288 GTO": {price: 2800000},
+  "Ferrari|1987 Ferrari F40": {price: 2000000, priceDisc: 1900000},
+  "Ferrari|1989 Ferrari F40 Competizione": {price: 3200000, priceDisc: 3040000},
+  "Ferrari|1992 Ferrari 512 TR": {price: 350000},
+  "Ferrari|1994 Ferrari F355 Berlinetta": {price: 237500},
+  "Ferrari|1995 Ferrari F50": {price: 4500000, priceDisc: 4275000},
+  "Ferrari|1996 Ferrari F50 GT": {price: 5500000},
+  "Ferrari|2002 Ferrari Enzo Ferrari": {price: 3500000, priceDisc: 3325000},
+  "Ferrari|2005 Ferrari FXX": {price: 2500000, priceDisc: 2375000},
+  "Ferrari|2007 Ferrari 430 Scuderia": {price: 355000, priceDisc: 337250},
+  "Ferrari|2009 Ferrari 458 Italia": {price: 210000, priceDisc: 199500},
+  "Ferrari|2010 Ferrari 599XX": {price: 2000000, priceDisc: 1900000},
+  "Ferrari|2012 Ferrari 599XX Evolution": {price: 3200000},
+  "Ferrari|2013 Ferrari 458 Speciale": {price: 500000, priceDisc: 475000},
+  "Ferrari|2013 Ferrari LaFerrari": {price: 3000000, priceDisc: 2850000},
+  "Ferrari|2014 Ferrari FXX K": {price: 4300000, priceDisc: 4085000},
+  "Ferrari|2015 Ferrari 488 GTB": {price: 250000, priceDisc: 237500},
+  "Ferrari|2015 Ferrari F12tdf": {price: 500000, priceDisc: 475000},
+  "Ferrari|2017 Ferrari 812 Superfast": {price: 395000, priceDisc: 375250},
+  "Ferrari|2017 Ferrari J50": {price: 2500000, priceDisc: 2375000},
+  "Ferrari|2017 Ferrari J50 Preorder Car": {price: 293550},
+  "Ferrari|2018 Ferrari FXX-K Evo": {price: 4500000, priceDisc: 4275000},
+  "Ferrari|2018 Ferrari FXX-K Evo Welcome Pack": {price: 250000, priceDisc: 237500},
+  "Ferrari|2018 Ferrari Portofino": {price: 200000, priceDisc: 190000},
+  "Ferrari|2019 Ferrari 488 Pista": {price: 716000, priceDisc: 680200},
+  "Ferrari|2019 Ferrari F8 Tributo": {price: 333000},
+  "Ferrari|2019 Ferrari Monza SP2": {price: 2500000, priceDisc: 2375000},
+  "Ferrari|2020 Ferrari Roma": {price: 250000},
+  "Ferrari|2020 Ferrari SF90 Stradale": {price: 575000, priceDisc: 546250},
+  "Ferrari|2022 Ferrari 296 GTB": {price: 361000},
+  "Ford|1932 Ford De Luxe Five-Window Coupe": {price: 36000, priceDisc: 34200},
+  "Ford|1965 Ford Mustang GT Coupe": {price: 52000, priceDisc: 49400},
+  "Ford|1966 Ford #2 GT40 Mk II": {price: 13200000, priceDisc: 12540000},
+  "Ford|1968 Ford Mustang GT 2+2 Fastback": {price: 119000, priceDisc: 113050},
+  "Ford|1968 Ford Mustang GT 2+2 Fastback Forza Edition": {price: 475000},
+  "Ford|1969 Ford Mustang Boss 302": {price: 75000, priceDisc: 71250},
+  "Ford|1973 Ford Capri RS3100": {price: 69000, priceDisc: 65550},
+  "Ford|1973 Ford XB Falcon GT": {price: 218000, priceDisc: 207100},
+  "Ford|1977 Ford #5 Escort RS1800 MkII": {price: 185000, priceDisc: 175750},
+  "Ford|1985 Ford RS200 Evolution": {price: 420000},
+  "Ford|1986 Ford F-150 XLT Lariat": {price: 45000, priceDisc: 42750},
+  "Ford|1986 Ford F-150 XLT Lariat Forza Edition": {price: 475000},
+  "Ford|1987 Ford Sierra Cosworth RS500": {price: 75050},
+  "Ford|1992 Ford Escort RS Cosworth": {price: 65000, priceDisc: 61750},
+  "Ford|1993 Ford Mustang SVT Cobra R": {price: 84000, priceDisc: 79800},
+  "Ford|1994 Ford Supervan 3": {price: 250000, priceDisc: 237500},
+  "Ford|1999 Ford Racing Puma": {price: 30000, priceDisc: 28500},
+  "Ford|2000 Ford Mustang SVT Cobra R": {price: 153000, priceDisc: 145350},
+  "Ford|2001 Ford #4 Ford Focus RS": {price: 415000, priceDisc: 394250},
+  "Ford|2003 Ford Focus RS": {price: 35000, priceDisc: 33250},
+  "Ford|2005 Ford GT": {price: 585000},
+  "Ford|2009 Ford Focus RS": {price: 52000, priceDisc: 49400},
+  "Ford|2010 Ford Crown Victoria Police Interceptor": {price: 15000, priceDisc: 14250},
+  "Ford|2011 Ford Transit SuperSportVan": {price: 42000, priceDisc: 39900},
+  "Ford|2013 Ford Mustang Shelby GT500": {price: 60000, priceDisc: 57000},
+  "Ford|2014 Ford #11 Rockstar F-150 Trophy Truck": {price: 450000, priceDisc: 427500},
+  "Ford|2014 Ford FPV Limited Edition Pursuit Ute": {price: 40000, priceDisc: 38000},
+  "Ford|2014 Ford Ranger T6 Rally Raid": {price: 350000},
+  "Ford|2016 Ford Mustang Shelby GT350R": {price: 88000, priceDisc: 83600},
+  "Ford|2017 Ford #14 Rahal Letterman Lanigan Racing Fiesta": {price: 150000, priceDisc: 142500},
+  "Ford|2017 Ford #25 'Brocky' Ultra4 Bronco RTR": {price: 75000, priceDisc: 71250},
+  "Ford|2017 Ford Focus RS": {price: 37000, priceDisc: 35150},
+  "Ford|2017 Ford GT": {price: 500000, priceDisc: 475000},
+  "Ford|2017 Ford M-Sport Fiesta RS": {price: 250000},
+  "Ford|2018 Ford Mustang RTR Spec 5": {price: 35000, priceDisc: 33250},
+  "Ford|2020 Ford #2069 Ford Performance Bronco R": {price: 450000, priceDisc: 427500},
+  "Ford|2020 Ford Mustang Shelby GT500": {price: 125000, priceDisc: 118750},
+  "Ford|2020 Ford Super Duty F-450 DRW PLATINUM": {price: 65000, priceDisc: 61750},
+  "Ford|2020 Ford Super Duty F-450 DRW PLATINUM Forza Edition": {price: 475000},
+  "Ford|2022 Ford Bronco Raptor": {price: 50000, priceDisc: 47500},
+  "Ford|2022 Ford Focus ST": {price: 34000, priceDisc: 32300},
+  "Ford|2022 Ford Supervan 4": {price: 2000000},
+  "Ford|2023 Ford F-150 Raptor R": {price: 110000, priceDisc: 104500},
+  "Ford|2023 Ford F-150 Raptor R Welcome Pack": {price: 50000, priceDisc: 47500},
+  "Ford|2023 Ford Fiesta ST": {price: 26000, priceDisc: 24700},
+  "Ford|2024 Ford Mustang Dark Horse": {price: 59000, priceDisc: 56050},
+  "Ford|2024 Ford Mustang GT": {price: 45000, priceDisc: 42750},
+  "Formula Drift|1989 Formula Drift #98 BMW 325i": {price: 150000, priceDisc: 142500},
+  "Formula Drift|1995 Formula Drift #34 Toyota Supra MkIV": {price: 150000, priceDisc: 142500},
+  "Formula Drift|1997 Formula Drift #777 Nissan 240SX": {price: 150000, priceDisc: 142500},
+  "Formula Drift|2006 Formula Drift #43 Dodge Viper SRT-10 ACR": {price: 250000},
+  "Formula Drift|2007 Formula Drift #117 599 GTB Fiorano": {price: 525000, priceDisc: 498750},
+  "Formula Drift|2009 Formula Drift #99 Mazda RX-8": {price: 150000, priceDisc: 142500},
+  "Formula Drift|2013 Formula Drift #777 Chevrolet Corvette": {price: 275000, priceDisc: 261250},
+  "Formula Drift|2015 Formula Drift #13 Ford Mustang": {price: 250000},
+  "Formula Drift|2016 Formula Drift #530 HSV Maloo GEN-F": {price: 150000, priceDisc: 142500},
+  "Formula Drift|2019 Formula Drift #411 Toyota Corolla Hatchback": {price: 150000, priceDisc: 142500},
+  "Formula Drift|2020 Formula Drift #151 Toyota GR Supra": {price: 185000, priceDisc: 175750},
+  "Formula Drift|2020 Formula Drift #91 BMW M2": {price: 150000, priceDisc: 142500},
+  "Formula Drift|2023 Formula Drift #64 Forsberg Racing Nissan Z": {price: 200000, priceDisc: 190000},
+  "Funco Motorsports|2018 Funco Motorsports F9": {price: 300000},
+  "GMC|1970 GMC Jimmy": {price: 60000, priceDisc: 57000},
+  "GMC|1991 GMC Syclone": {price: 46000, priceDisc: 43700},
+  "GMC|1992 GMC Typhoon": {price: 38000, priceDisc: 36100},
+  "GMC|2022 GMC HUMMER EV Pickup": {price: 95000, priceDisc: 90250},
+  "Gordon Murray Automotive|2020 Gordon Murray Automotive T.50": {price: 3050000, priceDisc: 2897500},
+  "GR|2025 GR GT Prototype": {price: 250000, priceDisc: 237500},
+  "Hennessey|2012 Hennessey Venom GT": {price: 1400000},
+  "Hennessey|2019 Hennessey Ford F-150 VelociRaptor 6X6": {price: 375000, priceDisc: 356250},
+  "Hennessey|2021 Hennessey Venom F5": {price: 2050000, priceDisc: 1947500},
+  "Holden|1977 Holden Torana A9X": {price: 500000, priceDisc: 475000},
+  "Honda|1970 Honda S800": {price: 40000, priceDisc: 38000},
+  "Honda|1974 Honda Civic RS": {price: 14000},
+  "Honda|1984 Honda City E II": {price: 7500, priceDisc: 7125},
+  "Honda|1984 Honda Civic CRX Mugen": {price: 50000},
+  "Honda|1986 Honda Civic Si": {price: 10000, priceDisc: 9500},
+  "Honda|1990 Honda #19 101 Motorsport CRX WTAC": {price: 150000, priceDisc: 142500},
+  "Honda|1991 Honda Beat": {price: 15000, priceDisc: 14250},
+  "Honda|1991 Honda CR-X SiR": {price: 237500},
+  "Honda|1992 Honda #21 Hardrace/JDMYard Civic WTAC": {price: 150000, priceDisc: 142500},
+  "Honda|1992 Honda NSX-R": {price: 450000, priceDisc: 427500},
+  "Honda|1994 Honda Acty": {price: 9000, priceDisc: 8550},
+  "Honda|1994 Honda Prelude Si": {price: 15000, priceDisc: 14250},
+  "Honda|1997 Honda Civic Type R": {price: 30000, priceDisc: 28500},
+  "Honda|2001 Honda #33 Integra WTAC": {price: 150000, priceDisc: 142500},
+  "Honda|2003 Honda S2000": {price: 55000, priceDisc: 52250},
+  "Honda|2004 Honda #52 Evasive Motorsports S2000 WTAC": {price: 320000, priceDisc: 304000},
+  "Honda|2004 Honda Civic Type R": {price: 15000, priceDisc: 14250},
+  "Honda|2005 Honda NSX-R": {price: 325000, priceDisc: 308750},
+  "Honda|2005 Honda NSX-R GT": {price: 570000},
+  "Honda|2007 Honda Civic Type R": {price: 17000, priceDisc: 16150},
+  "Honda|2008 Honda Civic Type R (FD2)": {price: 20000, priceDisc: 19000},
+  "Honda|2015 Honda Civic Type R": {price: 30000, priceDisc: 28500},
+  "Honda|2015 Honda Ridgeline Baja Trophy Truck": {price: 400000, priceDisc: 380000},
+  "Honda|2018 Honda Civic Type R": {price: 35000, priceDisc: 33250},
+  "Honda|2022 Honda e": {price: 30000, priceDisc: 28500},
+  "Honda|2023 Honda Civic Type R": {price: 43000, priceDisc: 40850},
+  "HSV|2014 HSV GEN-F GTS": {price: 81000, priceDisc: 76950},
+  "HSV|2014 HSV Limited Edition GEN-F GTS Maloo": {price: 65000, priceDisc: 61750},
+  "Hyundai|2019 Hyundai Veloster N": {price: 20000, priceDisc: 19000},
+  "Hyundai|2020 Hyundai i30 N": {price: 32000, priceDisc: 30400},
+  "Hyundai|2021 Hyundai i20 N": {price: 48000, priceDisc: 45600},
+  "Hyundai|2022 Hyundai N Vision 74": {price: 325000, priceDisc: 308750},
+  "Hyundai|2023 Hyundai IONIQ 5 N": {price: 22000, priceDisc: 20900},
+  "Jaguar|1956 Jaguar D-Type": {price: 4300000, priceDisc: 4085000},
+  "Jaguar|1961 Jaguar E-type": {price: 250000},
+  "Jaguar|1964 Jaguar Lightweight E-Type": {price: 7900000, priceDisc: 7505000},
+  "Jaguar|1991 Jaguar Sport XJR-15": {price: 950000, priceDisc: 902500},
+  "Jaguar|1993 Jaguar XJ220": {price: 570000, priceDisc: 541500},
+  "Jaguar|1993 Jaguar XJ220S TWR": {price: 540000, priceDisc: 513000},
+  "Jaguar|2010 Jaguar C-X75": {price: 3200000, priceDisc: 3040000},
+  "Jeep|2012 Jeep Wrangler Rubicon": {price: 16000, priceDisc: 15200},
+  "Jeep|2016 Jeep Trailcat": {price: 70000, priceDisc: 66500},
+  "Jeep|2018 Jeep Grand Cherokee Trackhawk": {price: 72000, priceDisc: 68400},
+  "Jeep|2020 Jeep JT": {price: 36000, priceDisc: 34200},
+  "Jimco|2019 Jimco #240 Fastball Racing Class 6100 Spec Trophy Truck": {price: 350000, priceDisc: 332500},
+  "Jimco|2020 Jimco #179 Hammerhead Class 1": {price: 95000, priceDisc: 90250},
+  "Koenigsegg|2008 Koenigsegg CCGT": {price: 3400000, priceDisc: 3230000},
+  "Koenigsegg|2011 Koenigsegg Agera": {price: 1950000, priceDisc: 1852500},
+  "Koenigsegg|2015 Koenigsegg One:1": {price: 3750000},
+  "Koenigsegg|2016 Koenigsegg Regera": {price: 2550000, priceDisc: 2422500},
+  "Koenigsegg|2017 Koenigsegg Agera RS": {price: 2900000, priceDisc: 2755000},
+  "Koenigsegg|2020 Koenigsegg Jesko": {price: 3500000, priceDisc: 3325000},
+  "Koenigsegg|2024 Koenigsegg Gemera": {price: 2000000, priceDisc: 1900000},
+  "KTM|2018 KTM X-Bow GT4": {price: 90000, priceDisc: 85500},
+  "Lamborghini|1967 Lamborghini Miura P400": {price: 1700000, priceDisc: 1615000},
+  "Lamborghini|1988 Lamborghini Countach LP5000 QV": {price: 600000},
+  "Lamborghini|1997 Lamborghini Diablo SV": {price: 375000},
+  "Lamborghini|1999 Lamborghini Diablo GTR": {price: 680000},
+  "Lamborghini|2010 Lamborghini Murciélago LP 670-4 SV": {price: 1000000, priceDisc: 950000},
+  "Lamborghini|2011 Lamborghini Sesto Elemento": {price: 2500000},
+  "Lamborghini|2012 Lamborghini Aventador LP700-4": {price: 345000},
+  "Lamborghini|2012 Lamborghini Gallardo LP570-4 Spyder Performante": {price: 210000, priceDisc: 199500},
+  "Lamborghini|2013 Lamborghini Veneno": {price: 3950000, priceDisc: 3752500},
+  "Lamborghini|2014 Lamborghini Huracán LP 610-4": {price: 200000, priceDisc: 190000},
+  "Lamborghini|2016 Lamborghini Centenario LP 770-4": {price: 1750000, priceDisc: 1662500},
+  "Lamborghini|2018 Lamborghini Aventador SVJ": {price: 1200000, priceDisc: 1140000},
+  "Lamborghini|2019 Lamborghini Urus": {price: 200000, priceDisc: 190000},
+  "Lamborghini|2020 Lamborghini Essenza SCV12": {price: 1500000, priceDisc: 1425000},
+  "Lamborghini|2020 Lamborghini Huracán EVO": {price: 237500},
+  "Lamborghini|2020 Lamborghini Huracán STO": {price: 325000, priceDisc: 308750},
+  "Lamborghini|2020 Lamborghini Sián Roadster": {price: 2500000, priceDisc: 2375000},
+  "Lamborghini|2021 Lamborghini Countach LPI 800-4": {price: 2100000, priceDisc: 1995000},
+  "Lamborghini|2022 Lamborghini Aventador LP 780-4 Ultimae": {price: 800000},
+  "Lamborghini|2022 Lamborghini Huracán Sterrato": {price: 325000},
+  "Lamborghini|2022 Lamborghini Huracán Tecnica": {price: 365000, priceDisc: 346750},
+  "Lamborghini|2024 Lamborghini Revuelto": {price: 365000, priceDisc: 346750},
+  "Lancia|1974 Lancia Stratos HF Stradale": {price: 680000},
+  "Lancia|1986 Lancia Delta S4": {price: 55000, priceDisc: 52250},
+  "Lancia|1992 Lancia Delta HF Integrale EVO": {price: 110000, priceDisc: 104500},
+  "Land Rover|2015 Land Rover Range Rover Sport SVR": {price: 48000, priceDisc: 45600},
+  "Land Rover|2020 Land Rover Defender 110 X": {price: 250000, priceDisc: 237500},
+  "Lexus|2010 Lexus LFA": {price: 875000, priceDisc: 831250},
+  "Lexus|2010 Lexus LFA Forza Edition": {price: 1250000},
+  "Lexus|2015 Lexus RC F": {price: 35000, priceDisc: 33250},
+  "Lexus|2021 Lexus LC 500": {price: 79000, priceDisc: 75050},
+  "Lincoln|1962 Lincoln Continental": {price: 61750},
+  "Lotus|1997 Lotus Elise GT1": {price: 1500000, priceDisc: 1425000},
+  "Lotus|1999 Lotus Elise Series 1 Sport 190": {price: 47000, priceDisc: 44650},
+  "Lotus|2018 Lotus Exige Cup 430": {price: 250000},
+  "Lotus|2018 Lotus Scura Motorsports Exige WTAC": {price: 400000},
+  "Lotus|2020 Lotus Evija": {price: 2450000, priceDisc: 2327500},
+  "Lotus|2020 Lotus Evija Forza Edition": {price: 475000},
+  "Lotus|2023 Lotus Emira": {price: 250000},
+  "Lucid|2024 Lucid Air Sapphire": {price: 240000, priceDisc: 228000},
+  "Maserati|1997 Maserati Ghibli Cup": {price: 102000, priceDisc: 96900},
+  "Maserati|2004 Maserati MC12": {price: 3750000},
+  "Maserati|2008 Maserati MC12 Versione Corsa": {price: 3100000, priceDisc: 2945000},
+  "Maserati|2022 Maserati MC20": {price: 220000, priceDisc: 209000},
+  "Mazda|1972 Mazda Cosmo 110S Series II": {price: 237500},
+  "Mazda|1973 Mazda RX-3": {price: 73000, priceDisc: 69350},
+  "Mazda|1973 Mazda RX-3 Forza Edition": {price: 500000},
+  "Mazda|1985 Mazda RX-7 GSL-SE": {price: 30000},
+  "Mazda|1990 Mazda Savanna RX-7": {price: 23000, priceDisc: 21850},
+  "Mazda|1991 Mazda #55 Mazda 787B": {price: 1220000},
+  "Mazda|1992 Mazda RX-7 Type R": {price: 40000, priceDisc: 38000},
+  "Mazda|1994 Mazda MX-5 Miata": {price: 15000, priceDisc: 14250},
+  "Mazda|1994 Mazda MX-5 Miata Forza Edition": {price: 500000},
+  "Mazda|2005 Mazda Mazdaspeed MX-5": {price: 21000, priceDisc: 19950},
+  "Mazda|2008 Mazda Furai": {price: 335350},
+  "Mazda|2010 Mazda Mazdaspeed 3": {price: 25000, priceDisc: 23750},
+  "Mazda|2011 Mazda RX-8 R3": {price: 33000, priceDisc: 31350},
+  "Mazda|2013 Mazda MX-5": {price: 28000, priceDisc: 26600},
+  "Mazda|2016 Mazda MX-5": {price: 18000, priceDisc: 17100},
+  "Mazda|2017 Mazda MX-5 Cup": {price: 60000, priceDisc: 57000},
+  "Mazda|2022 Mazda MX-5 Miata RF": {price: 29000, priceDisc: 27550},
+  "McLaren|1993 McLaren F1": {price: 5000000, priceDisc: 4750000},
+  "McLaren|1997 McLaren F1 GT": {price: 5500000, priceDisc: 5225000},
+  "McLaren|2011 McLaren 12C Coupé": {price: 105000, priceDisc: 99750},
+  "McLaren|2013 McLaren P1": {price: 1550000, priceDisc: 1472500},
+  "McLaren|2014 McLaren 650S Spider": {price: 130000, priceDisc: 123500},
+  "McLaren|2015 McLaren 570S Coupé": {price: 130000, priceDisc: 123500},
+  "McLaren|2018 McLaren 600LT Coupé": {price: 260000, priceDisc: 247000},
+  "McLaren|2019 McLaren Speedtail": {price: 2000000, priceDisc: 1900000},
+  "McLaren|2021 McLaren 620R": {price: 260000},
+  "McLaren|2021 McLaren 765LT Coupé": {price: 358000, priceDisc: 340100},
+  "McLaren|2021 McLaren Sabre": {price: 3400000},
+  "McLaren|2023 McLaren Artura": {price: 220000, priceDisc: 209000},
+  "Mercedes-AMG|2015 Mercedes-AMG GT S": {price: 90000, priceDisc: 85500},
+  "Mercedes-AMG|2016 Mercedes-AMG C 63 S Coupé": {price: 34000, priceDisc: 32300},
+  "Mercedes-AMG|2017 Mercedes-AMG GT R": {price: 237500},
+  "Mercedes-AMG|2018 Mercedes-AMG E 63 S": {price: 63000, priceDisc: 59850},
+  "Mercedes-AMG|2018 Mercedes-AMG GT 4-Door Coupé": {price: 250000},
+  "Mercedes-AMG|2020 Mercedes-AMG GT Black Series": {price: 440000, priceDisc: 418000},
+  "Mercedes-AMG|2020 Mercedes-AMG GT Black Series Welcome Pack": {price: 200000, priceDisc: 190000},
+  "Mercedes-AMG|2020 Mercedes-AMG SLC 43 Final Edition": {price: 50000, priceDisc: 47500},
+  "Mercedes-AMG|2021 Mercedes-AMG Mercedes-AMG ONE": {price: 2800000, priceDisc: 2660000},
+  "Mercedes-AMG|2021 Mercedes-AMG SL 63": {price: 120000, priceDisc: 114000},
+  "Mercedes-Benz|1954 Mercedes-Benz 300 SL Coupé": {price: 1700000, priceDisc: 1615000},
+  "Mercedes-Benz|1955 Mercedes-Benz 300 SLR": {price: 60000000, priceDisc: 57000000},
+  "Mercedes-Benz|1987 Mercedes-Benz AMG Hammer Coupe": {price: 225000, priceDisc: 213750},
+  "Mercedes-Benz|1990 Mercedes-Benz 190 E 2.5-16 Evolution II": {price: 200000, priceDisc: 190000},
+  "Mercedes-Benz|1990 Mercedes-Benz 190 E 2.5-16 Evolution II Forza Edition": {price: 750000},
+  "Mercedes-Benz|1998 Mercedes-Benz AMG CLK GTR": {price: 3600000},
+  "Mercedes-Benz|2009 Mercedes-Benz SL 65 AMG Black Series": {price: 360000, priceDisc: 342000},
+  "Mercedes-Benz|2012 Mercedes-Benz C 63 AMG Coupé Black Series": {price: 175000, priceDisc: 166250},
+  "Mercedes-Benz|2013 Mercedes-Benz A 45 AMG": {price: 25000, priceDisc: 23750},
+  "Mercedes-Benz|2013 Mercedes-Benz G 65 AMG": {price: 120000, priceDisc: 114000},
+  "Mercedes-Benz|2014 Mercedes-Benz G 63 AMG 6x6": {price: 780000},
+  "Mercedes-Benz|2014 Mercedes-Benz Unimog U5023": {price: 235000, priceDisc: 223250},
+  "Mercedes-Benz|2018 Mercedes-Benz X-Class": {price: 50000, priceDisc: 47500},
+  "Meyers|1971 Meyers Manx": {price: 34000, priceDisc: 32300},
+  "Meyers|2023 Meyers Manx 2.0": {price: 74000, priceDisc: 70300},
+  "MG|1986 MG Metro 6R4": {price: 220000, priceDisc: 209000},
+  "MINI|1965 MINI Cooper S": {price: 39000, priceDisc: 37050},
+  "MINI|2012 MINI John Cooper Works GP": {price: 30000, priceDisc: 28500},
+  "MINI|2013 MINI X-Raid All4 Racing Countryman": {price: 220000, priceDisc: 209000},
+  "MINI|2018 MINI X-raid John Cooper Works Buggy": {price: 425000},
+  "MINI|2021 MINI John Cooper Works GP": {price: 250000},
+  "Mitsubishi|1990 Mitsubishi #269 Attacking the Clock Racing Minicab Time Attack": {price: 100000, priceDisc: 95000},
+  "Mitsubishi|1992 Mitsubishi Galant VR-4": {price: 25000, priceDisc: 23750},
+  "Mitsubishi|1995 Mitsubishi Eclipse GSX": {price: 35000, priceDisc: 33250},
+  "Mitsubishi|1995 Mitsubishi Lancer Evolution III GSR": {price: 27550},
+  "Mitsubishi|1995 Mitsubishi Montero Exceed 2800 TD": {price: 25000, priceDisc: 23750},
+  "Mitsubishi|1997 Mitsubishi GTO": {price: 20000, priceDisc: 19000},
+  "Mitsubishi|1997 Mitsubishi Montero Evolution": {price: 50000},
+  "Mitsubishi|2001 Mitsubishi Lancer Evolution VI GSR TM Edition": {price: 70000, priceDisc: 66500},
+  "Mitsubishi|2004 Mitsubishi Lancer Evolution VIII MR": {price: 30000, priceDisc: 28500},
+  "Mitsubishi|2004 Mitsubishi Lancer Evolution VIII MR Welcome Pack": {price: 100000, priceDisc: 95000},
+  "Mitsubishi|2005 Mitsubishi #1 Sierra Sierra Enterprises Lancer Evolution Time Attack": {price: 90000},
+  "Mitsubishi|2006 Mitsubishi Lancer Evolution IX MR": {price: 237500},
+  "Mitsubishi|2008 Mitsubishi Lancer Evolution X GSR": {price: 25000, priceDisc: 23750},
+  "Nissan|1969 Nissan Fairlady Z 432": {price: 250000, priceDisc: 237500},
+  "Nissan|1971 Nissan Skyline 2000GT-R": {price: 160550},
+  "Nissan|1973 Nissan Skyline H/T 2000GT-R": {price: 416000, priceDisc: 395200},
+  "Nissan|1983 Nissan #11 Tomica Skyline Turbo Super Silhouette": {price: 301000},
+  "Nissan|1985 Nissan Safari Turbo": {price: 23750},
+  "Nissan|1987 Nissan Be-1": {price: 21850},
+  "Nissan|1987 Nissan Skyline GTS-R": {price: 41000, priceDisc: 38950},
+  "Nissan|1989 Nissan PAO": {price: 11400},
+  "Nissan|1989 Nissan S-Cargo": {price: 19000, priceDisc: 18050},
+  "Nissan|1989 Nissan S-Cargo Forza Edition": {price: 500000},
+  "Nissan|1989 Nissan Silvia K's": {price: 40000, priceDisc: 38000},
+  "Nissan|1990 Nissan #12 Skyline GT-R (BNR32 Gr.A) JTC": {price: 1500000, priceDisc: 1425000},
+  "Nissan|1990 Nissan Pulsar GTI-R": {price: 28000, priceDisc: 26600},
+  "Nissan|1991 Nissan Figaro": {price: 38000},
+  "Nissan|1992 Nissan Skyline GT-R": {price: 72000, priceDisc: 68400},
+  "Nissan|1993 Nissan #32 Skyline WTAC 'Xtreme GTR'": {price: 570000, priceDisc: 541500},
+  "Nissan|1993 Nissan 240SX": {price: 250000},
+  "Nissan|1994 Nissan Fairlady Z Version S Twin Turbo": {price: 40000, priceDisc: 38000},
+  "Nissan|1994 Nissan Silvia K's": {price: 20000, priceDisc: 19000},
+  "Nissan|1995 Nissan Gloria Gran Turismo": {price: 15000, priceDisc: 14250},
+  "Nissan|1995 Nissan NISMO GT-R LM": {price: 1100000, priceDisc: 1045000},
+  "Nissan|1997 Nissan Skyline GT-R V-Spec": {price: 237000},
+  "Nissan|1997 Nissan Stagea RS Four V": {price: 20000, priceDisc: 19000},
+  "Nissan|1998 Nissan #23 Pennzoil NISMO Skyline GT-R": {price: 570000},
+  "Nissan|1998 Nissan R390 (GT1)": {price: 1000000},
+  "Nissan|1998 Nissan Silvia K's Aero": {price: 22000, priceDisc: 20900},
+  "Nissan|2000 Nissan #36 Dream Project S15 Silvia WTAC": {price: 400000, priceDisc: 380000},
+  "Nissan|2000 Nissan Skyline GT-R V Spec II": {price: 200000, priceDisc: 190000},
+  "Nissan|2002 Nissan Silvia Spec-R": {price: 44000, priceDisc: 41800},
+  "Nissan|2003 Nissan Fairlady Z": {price: 18000, priceDisc: 17100},
+  "Nissan|2010 Nissan 370Z": {price: 43700},
+  "Nissan|2012 Nissan GT-R Black Edition (R35)": {price: 80000, priceDisc: 76000},
+  "Nissan|2012 Nissan GT-R Black Edition (R35) Forza Edition": {price: 750000},
+  "Nissan|2017 Nissan GT-R (R35)": {price: 115000, priceDisc: 109250},
+  "Nissan|2019 Nissan 370Z Nismo": {price: 46000, priceDisc: 43700},
+  "Nissan|2020 Nissan GT-R NISMO (R35)": {price: 270000, priceDisc: 256500},
+  "Nissan|2024 Nissan GT-R Nismo": {price: 220000, priceDisc: 209000},
+  "Nissan|2024 Nissan Z NISMO": {price: 60000, priceDisc: 57000},
+  "Noble|2010 Noble M600": {price: 322000, priceDisc: 305900},
+  "Opel|1984 Opel Manta 400": {price: 152000, priceDisc: 144400},
+  "Pagani|2009 Pagani Zonda R": {price: 4750000, priceDisc: 4512500},
+  "Pagani|2010 Pagani Zonda Cinque Roadster": {price: 4000000, priceDisc: 3800000},
+  "Pagani|2016 Pagani Huayra BC Coupe": {price: 3600000, priceDisc: 3420000},
+  "Pagani|2021 Pagani Huayra R": {price: 2750000},
+  "Peel|1962 Peel P50": {price: 21000, priceDisc: 19950},
+  "Peel|1962 Peel P50 Trolli Edition": {price: 21000},
+  "Penhall|2011 Penhall The Cholla": {price: 85000, priceDisc: 80750},
+  "Peugeot|1984 Peugeot 205 Turbo 16": {price: 261250},
+  "Peugeot|1991 Peugeot 205 Rallye": {price: 22000, priceDisc: 20900},
+  "Peugeot|2007 Peugeot 207 Super 2000": {price: 85000},
+  "Plymouth|1958 Plymouth Fury": {price: 53000, priceDisc: 50350},
+  "Plymouth|1968 Plymouth Barracuda Formula S": {price: 45000, priceDisc: 42750},
+  "Plymouth|1971 Plymouth Cuda 426 HEMI": {price: 125000, priceDisc: 118750},
+  "Polaris|2021 Polaris RZR Pro XP Factory Racing Limited Edition": {price: 50000, priceDisc: 47500},
+  "Polaris|2021 Polaris RZR Pro XP Ultimate": {price: 34000, priceDisc: 32300},
+  "Pontiac|1977 Pontiac Firebird Trans Am": {price: 60000, priceDisc: 57000},
+  "Pontiac|1987 Pontiac Firebird Trans Am GTA": {price: 25000, priceDisc: 23750},
+  "Porsche|1970 Porsche #3 917 LH": {price: 1000000, priceDisc: 950000},
+  "Porsche|1970 Porsche #3 917 LH Forza Edition": {price: 1250000},
+  "Porsche|1973 Porsche 911 Carrera RS": {price: 1050000, priceDisc: 997500},
+  "Porsche|1982 Porsche 911 Turbo 3.3": {price: 228000},
+  "Porsche|1985 Porsche #185 959 Prodrive Rally Raid": {price: 1500000, priceDisc: 1425000},
+  "Porsche|1987 Porsche 959": {price: 1875000},
+  "Porsche|1989 Porsche 944 Turbo": {price: 30000, priceDisc: 28500},
+  "Porsche|1993 Porsche 911 Turbo S Leichtbau": {price: 570000},
+  "Porsche|1993 Porsche 928 GTS": {price: 150000, priceDisc: 142500},
+  "Porsche|1993 Porsche 968 Turbo S": {price: 520000, priceDisc: 494000},
+  "Porsche|1995 Porsche 911 GT2": {price: 1100000},
+  "Porsche|1997 Porsche 911 GT1 Strassenversion": {price: 4000000, priceDisc: 3800000},
+  "Porsche|2003 Porsche Carrera GT": {price: 1800000},
+  "Porsche|2004 Porsche 911 GT3": {price: 135000, priceDisc: 128250},
+  "Porsche|2005 Porsche Cayman GT3 WTAC": {price: 180000, priceDisc: 171000},
+  "Porsche|2012 Porsche 911 GT3 RS 4.0": {price: 930000, priceDisc: 883500},
+  "Porsche|2014 Porsche 918 Spyder": {price: 2300000, priceDisc: 2185000},
+  "Porsche|2018 Porsche 718 Cayman GTS": {price: 75000, priceDisc: 71250},
+  "Porsche|2018 Porsche 911 GT2 RS": {price: 550000, priceDisc: 522500},
+  "Porsche|2018 Porsche Cayenne Turbo": {price: 79000, priceDisc: 75050},
+  "Porsche|2018 Porsche Macan LPR Rally Raid": {price: 250000, priceDisc: 237500},
+  "Porsche|2019 Porsche #70 Porsche Motorsport 935": {price: 1600000, priceDisc: 1520000},
+  "Porsche|2019 Porsche 911 Carrera S": {price: 145000, priceDisc: 137750},
+  "Porsche|2019 Porsche 911 GT3 RS": {price: 424000},
+  "Porsche|2020 Porsche Taycan Turbo S": {price: 200000, priceDisc: 190000},
+  "Porsche|2021 Porsche 911 GT3": {price: 260000, priceDisc: 247000},
+  "Porsche|2021 Porsche Mission R": {price: 5000000, priceDisc: 4750000},
+  "Porsche|2022 Porsche 718 Cayman GT4 RS": {price: 190000, priceDisc: 180500},
+  "Porsche|2023 Porsche 911 GT3 RS": {price: 424000, priceDisc: 402800},
+  "Porsche|2023 Porsche 911 Rallye": {price: 370500},
+  "Porsche|2023 Porsche 911 Turbo S": {price: 275000, priceDisc: 261250},
+  "Radical|2015 Radical RXC Turbo": {price: 147000, priceDisc: 139650},
+  "Ram|2024 Ram 1500 TRX": {price: 100000, priceDisc: 95000},
+  "Reliant|1972 Reliant Supervan III": {price: 39000, priceDisc: 37050},
+  "Renault|1967 Renault 8 Gordini": {price: 250000},
+  "Renault|1980 Renault 5 Turbo": {price: 143000, priceDisc: 135850},
+  "Renault|1993 Renault Clio Williams": {price: 30000, priceDisc: 28500},
+  "Renault|2008 Renault Mégane R26.R": {price: 58000, priceDisc: 55100},
+  "Renault|2010 Renault Megane RS 250": {price: 14000, priceDisc: 13300},
+  "Renault|2018 Renault Megane R.S.": {price: 32000, priceDisc: 30400},
+  "Rimac|2021 Rimac Nevera": {price: 2250000},
+  "Rivian|2022 Rivian R1T": {price: 56000, priceDisc: 53200},
+  "RJ Anderson|2016 RJ Anderson #37 Polaris RZR Pro 2 Truck": {price: 120000, priceDisc: 114000},
+  "RJ Anderson|2021 RJ Anderson #37 Polaris RZR Pro 4 Truck": {price: 250000},
+  "Saleen|2017 Saleen S7 LM": {price: 1000000},
+  "Schuppan|1993 Schuppan 962CR": {price: 1852500},
+  "Shelby|1965 Shelby Cobra 427 S/C": {price: 3000000},
+  "Shelby|1965 Shelby Cobra Daytona Coupe": {price: 20000000, priceDisc: 19000000},
+  "SIERRA Cars|2020 SIERRA Cars #23 Yokohama ALPHA": {price: 65000, priceDisc: 61750},
+  "SIERRA Cars|2021 SIERRA Cars 700R": {price: 75000, priceDisc: 71250},
+  "SIERRA Cars|2021 SIERRA Cars RX3": {price: 50000, priceDisc: 47500},
+  "SRT|2013 SRT Viper GTS": {price: 135000, priceDisc: 128250},
+  "Subaru|1980 Subaru BRAT GL": {price: 20000, priceDisc: 19000},
+  "Subaru|1990 Subaru LEGACY RS": {price: 15000, priceDisc: 14250},
+  "Subaru|1994 Subaru Vivio RX-R": {price: 10000, priceDisc: 9500},
+  "Subaru|1994 Subaru Vivio RX-R Forza Edition": {price: 750000},
+  "Subaru|1996 Subaru SVX": {price: 13000, priceDisc: 12350},
+  "Subaru|1998 Subaru Impreza 22B-STi Version": {price: 86000, priceDisc: 81700},
+  "Subaru|2004 Subaru IMPREZA WRX STI": {price: 30000, priceDisc: 28500},
+  "Subaru|2005 Subaru IMPREZA WRX STI": {price: 35000, priceDisc: 33250},
+  "Subaru|2005 Subaru LEGACY B4 2.0 GT": {price: 10000, priceDisc: 9500},
+  "Subaru|2008 Subaru IMPREZA WRX STI": {price: 27000, priceDisc: 25650},
+  "Subaru|2011 Subaru WRX STI": {price: 27000, priceDisc: 25650},
+  "Subaru|2013 Subaru BRZ": {price: 25000, priceDisc: 23750},
+  "Subaru|2015 Subaru WRX STI": {price: 27000, priceDisc: 25650},
+  "Subaru|2018 Subaru WRX STI ARX Supercar": {price: 150000},
+  "Subaru|2019 Subaru STI S209": {price: 250000},
+  "Subaru|2022 Subaru BRZ": {price: 28000, priceDisc: 26600},
+  "Subaru|2022 Subaru BRZ Forza Edition": {price: 500000},
+  "Subaru|2022 Subaru WRX": {price: 25000, priceDisc: 23750},
+  "Toyota|1965 Toyota Sports 800": {price: 250000},
+  "Toyota|1965 Toyota Sports 800 Fanta Edition": {price: 35000},
+  "Toyota|1969 Toyota 2000GT": {price: 950000},
+  "Toyota|1974 Toyota Corolla SR5": {price: 250000},
+  "Toyota|1979 Toyota FJ40": {price: 103000, priceDisc: 97850},
+  "Toyota|1985 Toyota Sprinter Trueno GT Apex": {price: 30000, priceDisc: 28500},
+  "Toyota|1985 Toyota Sprinter Trueno GT Apex Forza Edition": {price: 500000},
+  "Toyota|1989 Toyota MR2 SC": {price: 250000},
+  "Toyota|1991 Toyota Chaser GT Twin Turbo": {price: 20000, priceDisc: 19000},
+  "Toyota|1991 Toyota Sera": {price: 11000, priceDisc: 10450},
+  "Toyota|1992 Toyota Celica GT-Four RC ST185": {price: 30000, priceDisc: 28500},
+  "Toyota|1992 Toyota Supra 2.0 GT": {price: 28000, priceDisc: 26600},
+  "Toyota|1993 Toyota #1 T100 Baja Truck": {price: 400000, priceDisc: 380000},
+  "Toyota|1994 Toyota Celica GT-Four ST205": {price: 27000, priceDisc: 25650},
+  "Toyota|1995 Toyota J&J Motorsport Supra WTAC": {price: 420000, priceDisc: 399000},
+  "Toyota|1995 Toyota MR2 GT": {price: 28000, priceDisc: 26600},
+  "Toyota|1996 Toyota Starlet Glanza V": {price: 250000},
+  "Toyota|1997 Toyota Chaser 2.5 Tourer V": {price: 15500, priceDisc: 14725},
+  "Toyota|1997 Toyota Soarer 2.5 GT-T": {price: 18000, priceDisc: 17100},
+  "Toyota|1998 Toyota Supra RZ": {price: 60000, priceDisc: 57000},
+  "Toyota|1999 Toyota Altezza RS200 Z EDITION": {price: 250000},
+  "Toyota|2003 Toyota Celica Sport Specialty II": {price: 12000, priceDisc: 11400},
+  "Toyota|2005 Toyota Crown Super Deluxe Taxi": {price: 10000, priceDisc: 9500},
+  "Toyota|2013 Toyota 86": {price: 15000, priceDisc: 14250},
+  "Toyota|2013 Toyota 86 Stories": {price: 250000},
+  "Toyota|2016 Toyota Land Cruiser Arctic Trucks AT37": {price: 237500},
+  "Toyota|2017 Toyota JPN Taxi": {price: 25000, priceDisc: 23750},
+  "Toyota|2019 Toyota 4Runner TRD Pro": {price: 42000, priceDisc: 39900},
+  "Toyota|2019 Toyota Tacoma TRD Pro": {price: 34000, priceDisc: 32300},
+  "Toyota|2019 Toyota Tacoma TRD Pro Forza Edition": {price: 475000},
+  "Toyota|2020 Toyota GR Supra": {price: 45000, priceDisc: 42750},
+  "Toyota|2021 Toyota GR Yaris": {price: 54000, priceDisc: 51300},
+  "Toyota|2022 Toyota GR86": {price: 28000, priceDisc: 26600},
+  "Toyota|2023 Toyota Camry TRD": {price: 31000, priceDisc: 29450},
+  "Toyota|2025 Toyota Land Cruiser": {price: 70000, priceDisc: 66500},
+  "TVR|1998 TVR Cerbera Speed 12": {price: 712500},
+  "TVR|2005 TVR Sagaris": {price: 115000, priceDisc: 109250},
+  "TVR|2018 TVR Griffith": {price: 250000, priceDisc: 237500},
+  "Ultima|2015 Ultima Evolution Coupe 1020": {price: 150000, priceDisc: 142500},
+  "Volkswagen|1963 Volkswagen Beetle": {price: 17000, priceDisc: 16150},
+  "Volkswagen|1963 Volkswagen Type 2 De Luxe": {price: 178000, priceDisc: 169100},
+  "Volkswagen|1969 Volkswagen Class 5/1600 Baja Bug": {price: 35000, priceDisc: 33250},
+  "Volkswagen|1982 Volkswagen Pickup LX": {price: 16000, priceDisc: 15200},
+  "Volkswagen|1983 Volkswagen Golf GTI": {price: 18000, priceDisc: 17100},
+  "Volkswagen|1989 Volkswagen Rallye Golf": {price: 237500},
+  "Volkswagen|1992 Volkswagen Golf Gti 16v Mk2": {price: 22000, priceDisc: 20900},
+  "Volkswagen|1995 Volkswagen Corrado VR6": {price: 30000, priceDisc: 28500},
+  "Volkswagen|2010 Volkswagen Golf R": {price: 20000, priceDisc: 19000},
+  "Volkswagen|2011 Volkswagen Scirocco R": {price: 15000, priceDisc: 14250},
+  "Volkswagen|2014 Volkswagen Golf R": {price: 27000, priceDisc: 25650},
+  "Volkswagen|2017 Volkswagen #34 Andretti Rally Cross Beetle": {price: 150000, priceDisc: 142500},
+  "Volkswagen|2021 Volkswagen Golf R": {price: 29000, priceDisc: 27550},
+  "Volkswagen|2022 Volkswagen Golf R": {price: 35000, priceDisc: 33250},
+  "Volvo|1983 Volvo 242 Turbo Evolution": {price: 30000, priceDisc: 28500},
+  "Wuling|2013 Wuling Sunshine S": {price: 2000, priceDisc: 1900},
+  "Wuling|2013 Wuling Sunshine S Forza Edition": {price: 500000},
+  "Wuling|2022 Wuling Hongguang Mini EV": {price: 5000, priceDisc: 4750},
+  "Zenvo|2019 Zenvo TSR-S": {price: 1200000, priceDisc: 1140000}
+};
+
+/* prezzi salvati a mano nel browser (hanno priorità sui default incorporati) */
+let savedPrices = {};
+try { savedPrices = JSON.parse(localStorage.getItem(PRICE_KEY) || '{}'); } catch(e){ savedPrices = {}; }
+function getPrice(car, which){
+  const d = DEFAULT_PRICES[car.key];
+  return (d && d[which] != null) ? d[which] : null;
+}
+function priceText(car, which){
+  const v = getPrice(car, which);
+  return v == null ? '<span class="pi">—</span>' : '<span class="price-val">'+fmt(v)+'</span>';
+}
+function setPrice(car, which, val){
+  if(!savedPrices[car.key]) savedPrices[car.key] = {};
+  if(val === null || val === '' || isNaN(val)) delete savedPrices[car.key][which];
+  else savedPrices[car.key][which] = val;
+  if(Object.keys(savedPrices[car.key]).length === 0) delete savedPrices[car.key];
+  localStorage.setItem(PRICE_KEY, JSON.stringify(savedPrices));
+}
+
+/* ======================= STATE ======================= */
+const COLS = ['make','name','type','cls','country','collection','dlc','price','priceDisc'];
+
+/* ===================== LINGUE (i18n) ===================== */
+const I18N = {
+  it: {
+    titleSub:'Lista Auto', updated:'Aggiornato',
+    searchPh:'Cerca auto, marca, tipo, classe, nazione, collezione, DLC…',
+    brandBtn:'Cerca per Marca ▾', reset:'Azzera filtri',
+    themeLight:'☀ Tema chiaro', themeDark:'🌙 Tema scuro',
+    shown:(n,t)=>'<b>'+n+'</b> auto mostrate su <b>'+t+'</b>',
+    info:"Click su un'intestazione per ordinare",
+    empty:'Nessuna auto trovata.',
+    popupTitle:'Cerca per Marca', popupHint:'Clicca una marca per filtrare la tabella.',
+    typeBtn:'Cerca per Tipo ▾', classBtn:'Cerca per Classe ▾',
+    pickTypeTitle:'Cerca per Tipo', pickTypeHint:'Clicca un tipo per filtrare la tabella.',
+    pickClassTitle:'Cerca per Classe', pickClassHint:'Clicca una classe per filtrare la tabella.',
+    allMakes:'★ Tutte le marche', allTypes:'★ Tutti i tipi', allClasses:'★ Tutte le classi',
+    fMake:'Marca', fType:'Tipo', fClass:'Classe', fInCol:'Ricerca in colonna', fSearch:'Ricerca',
+    cols:{make:'Marca',name:'Nome',type:'Tipo',cls:'Classe',country:'Nazione',collection:'Collezione',dlc:'DLC',price:'Prezzo',priceDisc:'Prezzo Scontato'},
+    coll:{'collection journal':'Collezione Giornaliera','autoshow':'Autosalone','wheelspin':'Ruota della Fortuna','seasonal':'Stagionale'},
+    types:{'Buggies':'Buggy','Classic Muscle':'Muscle Classiche','Classic Racers':'Auto Da Corsa Classiche','Classic Rally':'Rally Classico','Classic Sports Cars':'Auto Sportive Classiche','Cult Cars':'Auto Di Culto','Drift Cars':'Auto Da Derapata','Eclectic Domestics':'Domestiche Eclettiche','Extreme Track Toys':'Giocattoli Da Gara Estremi','GT Cars':'Auto GT','Hot Hatch':'Hot Hatch','Hypercars':'Hypercar','Modern Muscle':'Muscle Moderne','Modern Rally':'Rally Moderne','Modern Sports Cars':'Auto Sportive Moderne','Modern Super Saloons':'Super Berline Moderne','Modern Supercars':'Supercar Moderne','Offroad':'Fuoristrada',"Pickups & 4x4's":'Pickup e 4x4','Rally Monsters':'Mostri Del Rally','Rare Classics':'Classiche Rare','Retro Hot Hatch':'Hot Hatch Rétro','Retro Muscle':'Muscle Rétro','Retro Racers':'Auto da Corsa Rètro','Retro Rally':'Rally Rétro','Retro Sports Cars':'Auto Sportive Rétro','Retro Super Saloons':'Super Berline Rétro','Retro Supercars':'Supercar Rétro','Rods and Customs':'HotRod e Personalizzate','Sports Utility Heroes':'Sports Utility Heroes','Super GT':'Super GT','Super Hot Hatch':'Super Hot Hatch','Track Toys':'Giocattoli Da Gara',"UTV's":'UTV','Unlimited Buggies':'Buggy Unlimited','Unlimited Offroad':'Fuoristrada Unlimited','Utility Heroes':'Veicoli Commerciali'}
+  },
+  en: {
+    titleSub:'Car List', updated:'Updated',
+    searchPh:'Search car, make, type, class, country, collection, DLC…',
+    brandBtn:'Search by Make ▾', reset:'Reset filters',
+    themeLight:'☀ Light theme', themeDark:'🌙 Dark theme',
+    shown:(n,t)=>'<b>'+n+'</b> cars shown of <b>'+t+'</b>',
+    info:'Click a header to sort',
+    empty:'No cars found.',
+    popupTitle:'Search by Make', popupHint:'Click a make to filter the table.',
+    typeBtn:'Search by Type ▾', classBtn:'Search by Class ▾',
+    pickTypeTitle:'Search by Type', pickTypeHint:'Click a type to filter the table.',
+    pickClassTitle:'Search by Class', pickClassHint:'Click a class to filter the table.',
+    allMakes:'★ All makes', allTypes:'★ All types', allClasses:'★ All classes',
+    fMake:'Make', fType:'Type', fClass:'Class', fInCol:'Searching column', fSearch:'Search',
+    cols:{make:'Make',name:'Name',type:'Type',cls:'Class',country:'Country',collection:'Collection',dlc:'DLC',price:'Price',priceDisc:'Discounted Price'},
+    coll:{}, types:{}
+  }
+};
+let lang = localStorage.getItem('fh6_lang') || 'it';
+
+/* normalizza: minuscolo + senza accenti (così "retro" trova "Rétro"/"Rètro") */
+const na = s => String(s).normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+
+/* traduce il valore Collezione (separato da virgole) nella lingua corrente */
+function collDisplay(car){
+  if(lang==='en' || !car.collection) return car.collection;
+  const map=I18N.it.coll;
+  return car.collection.split(',').map(part=>{
+    const p=part.trim(), low=p.toLowerCase();
+    if(map[low]) return map[low];
+    for(const en in map){ if(low.startsWith(en)) return map[en]+p.slice(en.length); }
+    return p;
+  }).join(', ');
+}
+
+/* traduce un valore Tipo nella lingua corrente */
+function typeName(t){ const m=I18N.it.types; return (lang==='it' && m[t]) ? m[t] : t; }
+function typeDisplay(car){ return typeName(car.type); }
+
+let state = {
+  sortKey: 'make',
+  sortDir: 1,        // 1 asc, -1 desc
+  brand: null,       // filtro marca attivo
+  type: null,        // filtro tipo attivo
+  cls: null,         // filtro classe attivo
+  query: '',
+  searchCol: null    // colonna auto-rilevata dalla ricerca
+};
+
+/* valori distinti per auto-detect ricerca */
+const distinct = {
+  make: new Set(cars.map(c=>na(c.make))),
+  type: new Set(),
+  cls: new Set(cars.map(c=>na(c.cls))),
+  country: new Set(cars.map(c=>na(c.country))),
+  collection: new Set(),
+  dlc: new Set(cars.filter(c=>c.dlc).map(c=>na(c.dlc)))
+};
+function rebuildDistinct(){
+  distinct.collection = new Set();
+  distinct.type = new Set();
+  cars.forEach(c => {
+    collDisplay(c).split(',').forEach(p => { const v=na(p.trim()); if(v) distinct.collection.add(v); });
+    distinct.type.add(na(typeName(c.type)));
+  });
+}
+rebuildDistinct();
+
+/* rileva quale colonna corrisponde meglio alla query */
+function detectColumn(q){
+  q = na(q.trim());
+  if(!q) return null;
+  const anyHas = set => [...set].some(v => v.includes(q));
+  // priorità: classe esatta, poi marca, nazione, tipo, collezione, dlc
+  if(CLASS_ORDER[q.toUpperCase()] || anyHas(distinct.cls)) return 'cls';
+  if(distinct.make.has(q) || anyHas(distinct.make)) return 'make';
+  if(distinct.country.has(q) || anyHas(distinct.country)) return 'country';
+  if(anyHas(distinct.type)) return 'type';
+  if(anyHas(distinct.collection)) return 'collection';
+  if(anyHas(distinct.dlc)) return 'dlc';
+  return null; // ricade su Nome+Marca
+}
+
+function carField(car, col){
+  switch(col){
+    case 'make': return car.make;
+    case 'name': return car.name;
+    case 'type': return typeDisplay(car);
+    case 'cls': return car.classFull;
+    case 'country': return car.country;
+    case 'collection': return collDisplay(car);
+    case 'dlc': return car.dlc;
+    default: return '';
+  }
+}
+
+function matchesQuery(car, q, col){
+  q = na(q);
+  if(col && col !== 'name'){
+    return na(carField(car, col)).includes(q);
+  }
+  // fallback: cerca su nome + marca
+  return na(car.name).includes(q) || na(car.make).includes(q);
+}
+
+/* ======================= RENDER ======================= */
+const tbody = document.getElementById('tbody');
+const emptyMsg = document.getElementById('emptyMsg');
+
+function compare(a, b){
+  const k = state.sortKey, d = state.sortDir;
+  let av, bv;
+  if(k === 'cls'){ av=CLASS_ORDER[a.cls]||99; bv=CLASS_ORDER[b.cls]||99; if(av===bv){ av=a.pi; bv=b.pi; } }
+  else if(k === 'price' || k === 'priceDisc'){
+    av = getPrice(a, k); bv = getPrice(b, k);
+    // valori vuoti sempre in fondo
+    if(av==null && bv==null) return a.make.localeCompare(b.make);
+    if(av==null) return 1;
+    if(bv==null) return -1;
+  }
+  else { av = carField(a,k).toLowerCase(); bv = carField(b,k).toLowerCase(); }
+  if(av < bv) return -1*d;
+  if(av > bv) return 1*d;
+  // tie-break stabile: marca poi nome
+  return (a.make+a.name).localeCompare(b.make+b.name);
+}
+
+function fmt(n){ return n==null ? '' : Number(n).toLocaleString('it-IT'); }
+
+function render(){
+  let rows = cars.slice();
+  if(state.brand) rows = rows.filter(c => c.make === state.brand);
+  if(state.type) rows = rows.filter(c => c.type === state.type);
+  if(state.cls) rows = rows.filter(c => c.cls === state.cls);
+  if(state.query){
+    const col = state.searchCol;
+    rows = rows.filter(c => matchesQuery(c, state.query, col));
+  }
+  rows.sort(compare);
+
+  // intestazioni: indicatore sort + colonna evidenziata da ricerca
+  document.querySelectorAll('#headRow th').forEach(th => {
+    const key = th.dataset.key;
+    th.classList.toggle('col-active', key === state.sortKey);
+    th.classList.toggle('highlight-col', !!state.query && key === state.searchCol);
+    const base = I18N[lang].cols[key];
+    const arrow = key === state.sortKey ? (state.sortDir===1?' ▲':' ▼') : '';
+    th.innerHTML = base + (arrow ? '<span class="arrow">'+arrow+'</span>' : '');
+  });
+
+  tbody.innerHTML = '';
+  const frag = document.createDocumentFragment();
+  rows.forEach(car => {
+    const tr = document.createElement('tr');
+    const hq = state.query.toLowerCase();
+    const hl = col => (state.query && state.searchCol===col) ? ' cell-highlight' : '';
+
+    tr.innerHTML =
+      '<td class="col-make'+hl('make')+'"><b>'+esc(car.make)+'</b></td>'+
+      '<td class="col-name'+hl('name')+'">'+esc(car.name)+'</td>'+
+      '<td class="'+hl('type')+'">'+esc(typeDisplay(car))+'</td>'+
+      '<td class="'+hl('cls')+'"><span class="cls"><span class="tag c'+clsClass(car.cls)+'">'+esc(car.cls)+'</span><span class="pi">'+car.pi+'</span></span></td>'+
+      '<td class="'+hl('country')+'">'+esc(car.country)+'</td>'+
+      '<td class="'+hl('collection')+'">'+esc(collDisplay(car))+'</td>'+
+      '<td class="'+hl('dlc')+'">'+(car.dlc?'<span class="badge">'+esc(car.dlc)+'</span>':'<span class="pi">—</span>')+'</td>'+
+      '<td class="col-price'+hl('price')+'">'+priceText(car,'price')+'</td>'+
+      '<td class="col-price'+hl('priceDisc')+'">'+priceText(car,'priceDisc')+'</td>';
+
+    frag.appendChild(tr);
+  });
+  tbody.appendChild(frag);
+
+  document.getElementById('metaCount').innerHTML = I18N[lang].shown(rows.length, cars.length);
+  emptyMsg.style.display = rows.length ? 'none' : 'block';
+
+  // riga filtro attivo
+  const af = document.getElementById('activeFilter');
+  let parts = [];
+  if(state.brand) parts.push(I18N[lang].fMake+': <b>'+esc(state.brand)+'</b>');
+  if(state.type) parts.push(I18N[lang].fType+': <b>'+esc(typeName(state.type))+'</b>');
+  if(state.cls) parts.push(I18N[lang].fClass+': <b>'+esc(state.cls)+'</b>');
+  if(state.query && state.searchCol) parts.push(I18N[lang].fInCol+': <b>'+I18N[lang].cols[state.searchCol]+'</b>');
+  else if(state.query) parts.push(I18N[lang].fSearch+': <b>'+esc(state.query)+'</b>');
+  af.innerHTML = parts.join(' • ');
+}
+
+function priceInput(car, which){
+  const inp = document.createElement('input');
+  inp.type = 'text';
+  inp.className = 'price-input';
+  inp.inputMode = 'numeric';
+  inp.placeholder = '—';
+  const v = getPrice(car, which);
+  if(v != null){ inp.value = fmt(v); inp.classList.add('has-val'); }
+  inp.title = which==='priceDisc' ? 'Prezzo scontato (con bonus case)' : 'Prezzo autosalone (CR)';
+  inp.addEventListener('focus', () => { const raw=getPrice(car,which); inp.value = raw!=null?raw:''; });
+  inp.addEventListener('blur', () => {
+    const num = parseInt(inp.value.replace(/[^\d]/g,''),10);
+    if(isNaN(num)){ setPrice(car,which,null); inp.value=''; inp.classList.remove('has-val'); }
+    else { setPrice(car,which,num); inp.value=fmt(num); inp.classList.add('has-val'); }
+  });
+  inp.addEventListener('keydown', e => { if(e.key==='Enter') inp.blur(); });
+  return inp;
+}
+
+function clsClass(c){ return ['D','C','B','A','S1','S2','R','X'].includes(c) ? c : 'D'; }
+function esc(s){ return String(s).replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch])); }
+
+/* ======================= EVENTS ======================= */
+// ordinamento
+document.querySelectorAll('#headRow th').forEach(th => {
+  th.addEventListener('click', () => {
+    const key = th.dataset.key;
+    if(state.sortKey === key){ state.sortDir *= -1; }
+    else { state.sortKey = key; state.sortDir = (key==='price'||key==='priceDisc') ? -1 : 1; }
+    render();
+  });
+});
+
+// ricerca
+const searchEl = document.getElementById('search');
+const scopeEl = document.getElementById('searchScope');
+const clearEl = document.getElementById('searchClear');
+searchEl.addEventListener('input', () => {
+  state.query = searchEl.value.trim();
+  state.searchCol = detectColumn(state.query);
+  if(state.query && state.searchCol){
+    scopeEl.style.display='block'; scopeEl.textContent = I18N[lang].cols[state.searchCol];
+  } else { scopeEl.style.display='none'; }
+  clearEl.classList.toggle('show', searchEl.value.length>0);
+  render();
+});
+// pulsante ✕ : azzera solo la ricerca
+clearEl.addEventListener('click', () => {
+  searchEl.value=''; state.query=''; state.searchCol=null;
+  scopeEl.style.display='none'; clearEl.classList.remove('show');
+  searchEl.focus(); render();
+});
+
+// reset
+document.getElementById('resetBtn').addEventListener('click', () => {
+  state.brand=null; state.type=null; state.cls=null; state.query=''; state.searchCol=null;
+  searchEl.value=''; scopeEl.style.display='none'; clearEl.classList.remove('show');
+  state.sortKey='make'; state.sortDir=1;
+  render();
+});
+
+// popup di ricerca (Marca / Tipo / Classe)
+const overlay = document.getElementById('brandOverlay');
+const brandGrid = document.getElementById('brandGrid');
+function buildPicker(kind){
+  const T = I18N[lang];
+  document.getElementById('popupTitle').textContent = kind==='brand'?T.popupTitle : kind==='type'?T.pickTypeTitle : T.pickClassTitle;
+  document.getElementById('popupHint').textContent  = kind==='brand'?T.popupHint  : kind==='type'?T.pickTypeHint  : T.pickClassHint;
+  brandGrid.innerHTML='';
+  const choose = key => { if(kind==='brand')state.brand=key; else if(kind==='type')state.type=key; else state.cls=key; overlay.classList.remove('open'); render(); };
+  const all = document.createElement('div');
+  all.className='brand-item all';
+  all.innerHTML=(kind==='brand'?T.allMakes:kind==='type'?T.allTypes:T.allClasses)+' <span class="cnt">'+cars.length+'</span>';
+  all.addEventListener('click', ()=>choose(null));
+  brandGrid.appendChild(all);
+  let items=[];
+  if(kind==='brand'){
+    const c={}; cars.forEach(x=>c[x.make]=(c[x.make]||0)+1);
+    items = Object.keys(c).sort((a,b)=>a.localeCompare(b)).map(k=>({key:k,label:esc(k),cnt:c[k]}));
+  } else if(kind==='type'){
+    const c={}; cars.forEach(x=>c[x.type]=(c[x.type]||0)+1);
+    items = Object.keys(c).map(k=>({key:k,label:esc(typeName(k)),cnt:c[k],sort:typeName(k).toLowerCase()})).sort((a,b)=>a.sort.localeCompare(b.sort));
+  } else {
+    const order=['D','C','B','A','S1','S2','R','X']; const c={}; cars.forEach(x=>c[x.cls]=(c[x.cls]||0)+1);
+    items = order.filter(k=>c[k]).map(k=>({key:k,label:'<span class="tag c'+clsClass(k)+'">'+k+'</span>',cnt:c[k]}));
+  }
+  items.forEach(it=>{
+    const d=document.createElement('div'); d.className='brand-item';
+    d.innerHTML=it.label+'<span class="cnt">'+it.cnt+'</span>';
+    d.addEventListener('click', ()=>choose(it.key));
+    brandGrid.appendChild(d);
+  });
+}
+document.getElementById('brandBtn').addEventListener('click', ()=>{ buildPicker('brand'); overlay.classList.add('open'); });
+document.getElementById('typeBtn').addEventListener('click', ()=>{ buildPicker('type'); overlay.classList.add('open'); });
+document.getElementById('classBtn').addEventListener('click', ()=>{ buildPicker('cls'); overlay.classList.add('open'); });
+document.getElementById('brandClose').addEventListener('click', ()=> overlay.classList.remove('open'));
+overlay.addEventListener('click', e => { if(e.target===overlay) overlay.classList.remove('open'); });
+document.addEventListener('keydown', e => { if(e.key==='Escape') overlay.classList.remove('open'); });
+
+// tema
+const themeBtn = document.getElementById('themeBtn');
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme', t);
+  themeBtn.textContent = t==='light' ? I18N[lang].themeDark : I18N[lang].themeLight;
+  localStorage.setItem('fh6_theme', t);
+}
+themeBtn.addEventListener('click', ()=>{
+  const cur = document.documentElement.getAttribute('data-theme');
+  applyTheme(cur==='light' ? 'dark' : 'light');
+});
+
+// lingua (selettore IT/EN)
+const langBtn = document.getElementById('langBtn');
+const langMenu = document.getElementById('langMenu');
+// bandiere come SVG inline (le emoji bandiera non si vedono su Windows in Chrome/Brave/Edge)
+function flagHTML(code){
+  if(code==='it') return '<svg class="flag" viewBox="0 0 3 2"><rect width="1" height="2" fill="#009246"/><rect x="1" width="1" height="2" fill="#fff"/><rect x="2" width="1" height="2" fill="#ce2b37"/></svg>';
+  return '<svg class="flag" viewBox="0 0 60 30"><rect width="60" height="30" fill="#012169"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/><path d="M0,0 L60,30 M60,0 L0,30" stroke="#C8102E" stroke-width="3"/><rect x="25" width="10" height="30" fill="#fff"/><rect y="10" width="60" height="10" fill="#fff"/><rect x="27" width="6" height="30" fill="#C8102E"/><rect y="12" width="60" height="6" fill="#C8102E"/></svg>';
+}
+function langLabel(code){ return flagHTML(code)+' '+(code==='it'?'IT':'EN'); }
+function applyLang(l){
+  lang = l; localStorage.setItem('fh6_lang', l);
+  const T = I18N[l];
+  document.getElementById('titleSub').textContent = T.titleSub;
+  document.getElementById('updatedTxt').textContent = T.updated + ' 19 May 2026';
+  searchEl.placeholder = T.searchPh;
+  document.getElementById('brandBtn').textContent = T.brandBtn;
+  document.getElementById('typeBtn').textContent = T.typeBtn;
+  document.getElementById('classBtn').textContent = T.classBtn;
+  document.getElementById('resetBtn').textContent = T.reset;
+  document.getElementById('metaInfo').textContent = T.info;
+  emptyMsg.textContent = T.empty;
+  document.getElementById('popupTitle').textContent = T.popupTitle;
+  document.getElementById('popupHint').textContent = T.popupHint;
+  langBtn.innerHTML = langLabel(l) + ' ▾';
+  langMenu.innerHTML = '';
+  const other = l==='it' ? 'en' : 'it';
+  const opt = document.createElement('div');
+  opt.className = 'lang-opt';
+  opt.innerHTML = langLabel(other);
+  opt.addEventListener('click', e => { e.stopPropagation(); langMenu.classList.remove('open'); applyLang(other); });
+  langMenu.appendChild(opt);
+  applyTheme(document.documentElement.getAttribute('data-theme') || 'dark'); // testo tema nella lingua giusta
+  rebuildDistinct();
+  state.searchCol = detectColumn(state.query);
+  if(state.query && state.searchCol){ scopeEl.style.display='block'; scopeEl.textContent = T.cols[state.searchCol]; } else { scopeEl.style.display='none'; }
+  render();
+}
+langBtn.addEventListener('click', e => { e.stopPropagation(); langMenu.classList.toggle('open'); });
+document.addEventListener('click', () => langMenu.classList.remove('open'));
+
+// init
+applyTheme(localStorage.getItem('fh6_theme') || 'dark');
+applyLang(lang);
+</script>
+</body>
+</html>

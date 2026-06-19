@@ -1642,6 +1642,16 @@ function rebuildDistinct(){
 }
 rebuildDistinct();
 
+/* "haystack" normalizzato di ogni auto: tutti i campi cercabili insieme.
+   Serve alla ricerca multi-parola (ogni parola deve comparire da qualche parte). */
+function rebuildHay(){
+  cars.forEach(c => {
+    c._hay = na([c.make, c.name, c.year, c.classFull, c.cls, c.country, c.dlc,
+                 c.type, typeDisplay(c), c.collection, collDisplay(c)].join(' '));
+  });
+}
+rebuildHay();
+
 /* rileva quale colonna corrisponde meglio alla query */
 function detectColumn(q){
   q = na(q.trim());
@@ -1718,8 +1728,13 @@ function render(){
   if(state.country) rows = rows.filter(c => c.country === state.country);
   if(state.decade != null) rows = rows.filter(c => c.year && +c.year >= state.decade && +c.year < state.decade+10);
   if(state.query){
-    const col = state.searchCol;
-    rows = rows.filter(c => matchesQuery(c, state.query, col));
+    const terms = state.query.split(/\s+/).map(na).filter(Boolean);
+    if(terms.length > 1){
+      // più parole: ognuna deve comparire in un campo qualsiasi dell'auto
+      rows = rows.filter(c => terms.every(t => c._hay.includes(t)));
+    } else {
+      rows = rows.filter(c => matchesQuery(c, state.query, state.searchCol));
+    }
   }
   rows.sort(compare);
 
@@ -1811,7 +1826,8 @@ const scopeEl = document.getElementById('searchScope');
 const clearEl = document.getElementById('searchClear');
 searchEl.addEventListener('input', () => {
   state.query = searchEl.value.trim();
-  state.searchCol = detectColumn(state.query);
+  const multi = state.query.split(/\s+/).filter(Boolean).length > 1;
+  state.searchCol = multi ? null : detectColumn(state.query);  // più parole = ricerca globale
   if(state.query && state.searchCol){
     scopeEl.style.display='block'; scopeEl.textContent = I18N[lang].cols[state.searchCol];
   } else { scopeEl.style.display='none'; }
@@ -1932,7 +1948,9 @@ function applyLang(l){
   langMenu.appendChild(opt);
   applyTheme(document.documentElement.getAttribute('data-theme') || 'dark'); // testo tema nella lingua giusta
   rebuildDistinct();
-  state.searchCol = detectColumn(state.query);
+  rebuildHay();
+  const multi = state.query.split(/\s+/).filter(Boolean).length > 1;
+  state.searchCol = multi ? null : detectColumn(state.query);
   if(state.query && state.searchCol){ scopeEl.style.display='block'; scopeEl.textContent = T.cols[state.searchCol]; } else { scopeEl.style.display='none'; }
   render();
 }

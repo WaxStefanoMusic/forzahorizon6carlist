@@ -167,6 +167,10 @@
   .brand-grid{
     column-width:175px; column-gap:18px;
   }
+  /* layout a riga (sx→dx, a-capo al limite) per Decade e Classe */
+  .brand-grid.flow{ column-width:auto; display:flex; flex-wrap:wrap; gap:8px 10px; }
+  .brand-grid.flow .brand-item{ margin:0; }
+  .brand-grid.flow .brand-item.all{ flex:0 0 100%; margin:0 0 4px; }
   .brand-item{
     cursor:pointer; padding:6px 10px; border-radius:7px; font-size:13px;
     border:1px solid transparent; white-space:nowrap;
@@ -1840,6 +1844,7 @@ function buildPicker(kind){
   const alls   = {brand:T.allMakes,   type:T.allTypes,      cls:T.allClasses,     country:T.allCountries,    decade:T.allYears};
   document.getElementById('popupTitle').textContent = titles[kind];
   document.getElementById('popupHint').textContent  = hints[kind];
+  brandGrid.classList.toggle('flow', kind==='decade' || kind==='cls');
   brandGrid.innerHTML='';
   const choose = key => { if(kind==='brand')state.brand=key; else if(kind==='type')state.type=key; else if(kind==='cls')state.cls=key; else if(kind==='country')state.country=key; else state.decade=key; overlay.classList.remove('open'); render(); };
   const all = document.createElement('div');

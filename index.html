@@ -1726,6 +1726,13 @@ const emptyMsg = document.getElementById('emptyMsg');
 function compare(a, b){
   const k = state.sortKey, d = state.sortDir;
   let av, bv;
+  if(k === 'make'){
+    if(a.make !== b.make) return a.make.localeCompare(b.make) * d;
+    // stessa marca: anno DECRESCENTE (più recente prima), poi nome
+    const ay = a.year ? +a.year : -1, by = b.year ? +b.year : -1;
+    if(ay !== by) return by - ay;
+    return a.nameClean.localeCompare(b.nameClean);
+  }
   if(k === 'owned'){ av = owned.has(a.pid)?1:0; bv = owned.has(b.pid)?1:0; }
   else if(k === 'cls'){ av=CLASS_ORDER[a.cls]||99; bv=CLASS_ORDER[b.cls]||99; if(av===bv){ av=a.pi; bv=b.pi; } }
   else if(k === 'year'){

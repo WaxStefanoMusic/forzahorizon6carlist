@@ -237,7 +237,7 @@
     <table id="carTable">
       <thead>
         <tr id="headRow">
-          <th data-key="owned">Possesso</th>
+          <th data-key="owned">Possedute</th>
           <th data-key="make">Marca</th>
           <th data-key="name">Nome</th>
           <th data-key="year">Anno</th>
@@ -1579,7 +1579,7 @@ const I18N = {
     pickYearTitle:'Cerca per Decade', pickYearHint:'Clicca una decade per filtrare la tabella.',
     allMakes:'★ Tutte le marche', allTypes:'★ Tutti i tipi', allClasses:'★ Tutte le classi', allCountries:'★ Tutte le nazioni', allYears:'★ Tutti gli anni',
     fMake:'Marca', fType:'Tipo', fClass:'Classe', fCountry:'Nazione', fYear:'Anno', fInCol:'Ricerca in colonna', fSearch:'Ricerca',
-    cols:{owned:'Possesso',make:'Marca',name:'Nome',year:'Anno',type:'Tipo',cls:'Classe',country:'Nazione',collection:'Collezione',dlc:'DLC',price:'Prezzo',priceDisc:'Prezzo Scontato'},
+    cols:{owned:'Possedute',make:'Marca',name:'Nome',year:'Anno',type:'Tipo',cls:'Classe',country:'Nazione',collection:'Collezione',dlc:'DLC',price:'Prezzo',priceDisc:'Prezzo Scontato'},
     ownedLbl:'Possedute', undo:'Annulla ultima modifica',
     coll:{'collection journal':'Collezione Giornaliera','autoshow':'Autosalone','wheelspin':'Ruota della Fortuna','seasonal':'Stagionale'},
     types:{'Buggies':'Buggy','Classic Muscle':'Muscle Classiche','Classic Racers':'Auto Da Corsa Classiche','Classic Rally':'Rally Classico','Classic Sports Cars':'Auto Sportive Classiche','Cult Cars':'Auto Di Culto','Drift Cars':'Auto Da Derapata','Eclectic Domestics':'Domestiche Eclettiche','Extreme Track Toys':'Giocattoli Da Gara Estremi','GT Cars':'Auto GT','Hot Hatch':'Hot Hatch','Hypercars':'Hypercar','Modern Muscle':'Muscle Moderne','Modern Rally':'Rally Moderne','Modern Sports Cars':'Auto Sportive Moderne','Modern Super Saloons':'Super Berline Moderne','Modern Supercars':'Supercar Moderne','Offroad':'Fuoristrada',"Pickups & 4x4's":'Pickup e 4x4','Rally Monsters':'Mostri Del Rally','Rare Classics':'Classiche Rare','Retro Hot Hatch':'Hot Hatch Rétro','Retro Muscle':'Muscle Rétro','Retro Racers':'Auto da Corsa Rètro','Retro Rally':'Rally Rétro','Retro Sports Cars':'Auto Sportive Rétro','Retro Super Saloons':'Super Berline Rétro','Retro Supercars':'Supercar Rétro','Rods and Customs':'HotRod e Personalizzate','Sports Utility Heroes':'Sports Utility Heroes','Super GT':'Super GT','Super Hot Hatch':'Super Hot Hatch','Track Toys':'Giocattoli Da Gara',"UTV's":'UTV','Unlimited Buggies':'Buggy Unlimited','Unlimited Offroad':'Fuoristrada Unlimited','Utility Heroes':'Veicoli Commerciali'}
@@ -1803,7 +1803,7 @@ function render(){
     const hl = col => (state.query && state.searchCol===col) ? ' cell-highlight' : '';
 
     tr.innerHTML =
-      '<td class="col-owned"><input type="checkbox" class="own-chk" data-id="'+car.id+'"'+(owned.has(car.pid)?' checked':'')+' aria-label="Possesso"></td>'+
+      '<td class="col-owned"><input type="checkbox" class="own-chk" data-id="'+car.id+'"'+(owned.has(car.pid)?' checked':'')+' aria-label="Posseduta"></td>'+
       '<td class="col-make'+hl('make')+'"><b>'+esc(car.make)+'</b></td>'+
       '<td class="col-name'+hl('name')+'">'+esc(car.nameClean)+'</td>'+
       '<td class="col-year'+hl('year')+'">'+(car.year?esc(car.year):'<span class="pi">—</span>')+'</td>'+

@@ -203,6 +203,7 @@
   <button class="btn" id="brandBtn">Cerca per Marca ▾</button>
   <button class="btn" id="typeBtn">Cerca per Tipo ▾</button>
   <button class="btn" id="classBtn">Cerca per Classe ▾</button>
+  <button class="btn" id="countryBtn">Cerca per Nazione ▾</button>
   <button class="btn secondary" id="resetBtn">Azzera filtri</button>
 </div>
 
@@ -1544,11 +1545,12 @@ const I18N = {
     info:"Click su un'intestazione per ordinare",
     empty:'Nessuna auto trovata.',
     popupTitle:'Cerca per Marca', popupHint:'Clicca una marca per filtrare la tabella.',
-    typeBtn:'Cerca per Tipo ▾', classBtn:'Cerca per Classe ▾',
+    typeBtn:'Cerca per Tipo ▾', classBtn:'Cerca per Classe ▾', countryBtn:'Cerca per Nazione ▾',
     pickTypeTitle:'Cerca per Tipo', pickTypeHint:'Clicca un tipo per filtrare la tabella.',
     pickClassTitle:'Cerca per Classe', pickClassHint:'Clicca una classe per filtrare la tabella.',
-    allMakes:'★ Tutte le marche', allTypes:'★ Tutti i tipi', allClasses:'★ Tutte le classi',
-    fMake:'Marca', fType:'Tipo', fClass:'Classe', fInCol:'Ricerca in colonna', fSearch:'Ricerca',
+    pickCountryTitle:'Cerca per Nazione', pickCountryHint:'Clicca una nazione per filtrare la tabella.',
+    allMakes:'★ Tutte le marche', allTypes:'★ Tutti i tipi', allClasses:'★ Tutte le classi', allCountries:'★ Tutte le nazioni',
+    fMake:'Marca', fType:'Tipo', fClass:'Classe', fCountry:'Nazione', fInCol:'Ricerca in colonna', fSearch:'Ricerca',
     cols:{make:'Marca',name:'Nome',type:'Tipo',cls:'Classe',country:'Nazione',collection:'Collezione',dlc:'DLC',price:'Prezzo',priceDisc:'Prezzo Scontato'},
     coll:{'collection journal':'Collezione Giornaliera','autoshow':'Autosalone','wheelspin':'Ruota della Fortuna','seasonal':'Stagionale'},
     types:{'Buggies':'Buggy','Classic Muscle':'Muscle Classiche','Classic Racers':'Auto Da Corsa Classiche','Classic Rally':'Rally Classico','Classic Sports Cars':'Auto Sportive Classiche','Cult Cars':'Auto Di Culto','Drift Cars':'Auto Da Derapata','Eclectic Domestics':'Domestiche Eclettiche','Extreme Track Toys':'Giocattoli Da Gara Estremi','GT Cars':'Auto GT','Hot Hatch':'Hot Hatch','Hypercars':'Hypercar','Modern Muscle':'Muscle Moderne','Modern Rally':'Rally Moderne','Modern Sports Cars':'Auto Sportive Moderne','Modern Super Saloons':'Super Berline Moderne','Modern Supercars':'Supercar Moderne','Offroad':'Fuoristrada',"Pickups & 4x4's":'Pickup e 4x4','Rally Monsters':'Mostri Del Rally','Rare Classics':'Classiche Rare','Retro Hot Hatch':'Hot Hatch Rétro','Retro Muscle':'Muscle Rétro','Retro Racers':'Auto da Corsa Rètro','Retro Rally':'Rally Rétro','Retro Sports Cars':'Auto Sportive Rétro','Retro Super Saloons':'Super Berline Rétro','Retro Supercars':'Supercar Rétro','Rods and Customs':'HotRod e Personalizzate','Sports Utility Heroes':'Sports Utility Heroes','Super GT':'Super GT','Super Hot Hatch':'Super Hot Hatch','Track Toys':'Giocattoli Da Gara',"UTV's":'UTV','Unlimited Buggies':'Buggy Unlimited','Unlimited Offroad':'Fuoristrada Unlimited','Utility Heroes':'Veicoli Commerciali'}
@@ -1562,11 +1564,12 @@ const I18N = {
     info:'Click a header to sort',
     empty:'No cars found.',
     popupTitle:'Search by Make', popupHint:'Click a make to filter the table.',
-    typeBtn:'Search by Type ▾', classBtn:'Search by Class ▾',
+    typeBtn:'Search by Type ▾', classBtn:'Search by Class ▾', countryBtn:'Search by Country ▾',
     pickTypeTitle:'Search by Type', pickTypeHint:'Click a type to filter the table.',
     pickClassTitle:'Search by Class', pickClassHint:'Click a class to filter the table.',
-    allMakes:'★ All makes', allTypes:'★ All types', allClasses:'★ All classes',
-    fMake:'Make', fType:'Type', fClass:'Class', fInCol:'Searching column', fSearch:'Search',
+    pickCountryTitle:'Search by Country', pickCountryHint:'Click a country to filter the table.',
+    allMakes:'★ All makes', allTypes:'★ All types', allClasses:'★ All classes', allCountries:'★ All countries',
+    fMake:'Make', fType:'Type', fClass:'Class', fCountry:'Country', fInCol:'Searching column', fSearch:'Search',
     cols:{make:'Make',name:'Name',type:'Type',cls:'Class',country:'Country',collection:'Collection',dlc:'DLC',price:'Price',priceDisc:'Discounted Price'},
     coll:{}, types:{}
   }
@@ -1598,6 +1601,7 @@ let state = {
   brand: null,       // filtro marca attivo
   type: null,        // filtro tipo attivo
   cls: null,         // filtro classe attivo
+  country: null,     // filtro nazione attivo
   query: '',
   searchCol: null    // colonna auto-rilevata dalla ricerca
 };
@@ -1687,6 +1691,7 @@ function render(){
   if(state.brand) rows = rows.filter(c => c.make === state.brand);
   if(state.type) rows = rows.filter(c => c.type === state.type);
   if(state.cls) rows = rows.filter(c => c.cls === state.cls);
+  if(state.country) rows = rows.filter(c => c.country === state.country);
   if(state.query){
     const col = state.searchCol;
     rows = rows.filter(c => matchesQuery(c, state.query, col));
@@ -1734,6 +1739,7 @@ function render(){
   if(state.brand) parts.push(I18N[lang].fMake+': <b>'+esc(state.brand)+'</b>');
   if(state.type) parts.push(I18N[lang].fType+': <b>'+esc(typeName(state.type))+'</b>');
   if(state.cls) parts.push(I18N[lang].fClass+': <b>'+esc(state.cls)+'</b>');
+  if(state.country) parts.push(I18N[lang].fCountry+': <b>'+esc(state.country)+'</b>');
   if(state.query && state.searchCol) parts.push(I18N[lang].fInCol+': <b>'+I18N[lang].cols[state.searchCol]+'</b>');
   else if(state.query) parts.push(I18N[lang].fSearch+': <b>'+esc(state.query)+'</b>');
   af.innerHTML = parts.join(' • ');
@@ -1794,24 +1800,27 @@ clearEl.addEventListener('click', () => {
 
 // reset
 document.getElementById('resetBtn').addEventListener('click', () => {
-  state.brand=null; state.type=null; state.cls=null; state.query=''; state.searchCol=null;
+  state.brand=null; state.type=null; state.cls=null; state.country=null; state.query=''; state.searchCol=null;
   searchEl.value=''; scopeEl.style.display='none'; clearEl.classList.remove('show');
   state.sortKey='make'; state.sortDir=1;
   render();
 });
 
-// popup di ricerca (Marca / Tipo / Classe)
+// popup di ricerca (Marca / Tipo / Classe / Nazione)
 const overlay = document.getElementById('brandOverlay');
 const brandGrid = document.getElementById('brandGrid');
 function buildPicker(kind){
   const T = I18N[lang];
-  document.getElementById('popupTitle').textContent = kind==='brand'?T.popupTitle : kind==='type'?T.pickTypeTitle : T.pickClassTitle;
-  document.getElementById('popupHint').textContent  = kind==='brand'?T.popupHint  : kind==='type'?T.pickTypeHint  : T.pickClassHint;
+  const titles = {brand:T.popupTitle, type:T.pickTypeTitle, cls:T.pickClassTitle, country:T.pickCountryTitle};
+  const hints  = {brand:T.popupHint,  type:T.pickTypeHint,  cls:T.pickClassHint,  country:T.pickCountryHint};
+  const alls   = {brand:T.allMakes,   type:T.allTypes,      cls:T.allClasses,     country:T.allCountries};
+  document.getElementById('popupTitle').textContent = titles[kind];
+  document.getElementById('popupHint').textContent  = hints[kind];
   brandGrid.innerHTML='';
-  const choose = key => { if(kind==='brand')state.brand=key; else if(kind==='type')state.type=key; else state.cls=key; overlay.classList.remove('open'); render(); };
+  const choose = key => { if(kind==='brand')state.brand=key; else if(kind==='type')state.type=key; else if(kind==='cls')state.cls=key; else state.country=key; overlay.classList.remove('open'); render(); };
   const all = document.createElement('div');
   all.className='brand-item all';
-  all.innerHTML=(kind==='brand'?T.allMakes:kind==='type'?T.allTypes:T.allClasses)+' <span class="cnt">'+cars.length+'</span>';
+  all.innerHTML=alls[kind]+' <span class="cnt">'+cars.length+'</span>';
   all.addEventListener('click', ()=>choose(null));
   brandGrid.appendChild(all);
   let items=[];
@@ -1821,6 +1830,9 @@ function buildPicker(kind){
   } else if(kind==='type'){
     const c={}; cars.forEach(x=>c[x.type]=(c[x.type]||0)+1);
     items = Object.keys(c).map(k=>({key:k,label:esc(typeName(k)),cnt:c[k],sort:typeName(k).toLowerCase()})).sort((a,b)=>a.sort.localeCompare(b.sort));
+  } else if(kind==='country'){
+    const c={}; cars.forEach(x=>c[x.country]=(c[x.country]||0)+1);
+    items = Object.keys(c).sort((a,b)=>a.localeCompare(b)).map(k=>({key:k,label:esc(k),cnt:c[k]}));
   } else {
     const order=['D','C','B','A','S1','S2','R','X']; const c={}; cars.forEach(x=>c[x.cls]=(c[x.cls]||0)+1);
     items = order.filter(k=>c[k]).map(k=>({key:k,label:'<span class="tag c'+clsClass(k)+'">'+k+'</span>',cnt:c[k]}));
@@ -1834,6 +1846,7 @@ function buildPicker(kind){
 }
 document.getElementById('brandBtn').addEventListener('click', ()=>{ buildPicker('brand'); overlay.classList.add('open'); });
 document.getElementById('typeBtn').addEventListener('click', ()=>{ buildPicker('type'); overlay.classList.add('open'); });
+document.getElementById('countryBtn').addEventListener('click', ()=>{ buildPicker('country'); overlay.classList.add('open'); });
 document.getElementById('classBtn').addEventListener('click', ()=>{ buildPicker('cls'); overlay.classList.add('open'); });
 document.getElementById('brandClose').addEventListener('click', ()=> overlay.classList.remove('open'));
 overlay.addEventListener('click', e => { if(e.target===overlay) overlay.classList.remove('open'); });
@@ -1869,6 +1882,7 @@ function applyLang(l){
   document.getElementById('brandBtn').textContent = T.brandBtn;
   document.getElementById('typeBtn').textContent = T.typeBtn;
   document.getElementById('classBtn').textContent = T.classBtn;
+  document.getElementById('countryBtn').textContent = T.countryBtn;
   document.getElementById('resetBtn').textContent = T.reset;
   document.getElementById('metaInfo').textContent = T.info;
   emptyMsg.textContent = T.empty;

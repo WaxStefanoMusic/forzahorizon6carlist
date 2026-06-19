@@ -118,6 +118,7 @@
   /* colonne che restano su una riga */
   thead th[data-key="make"], tbody td.col-make,
   thead th[data-key="country"], thead th[data-key="cls"]{ white-space:nowrap; }
+  thead th[data-key="year"], tbody td.col-year{ white-space:nowrap; text-align:center; }
   tbody tr:nth-child(even){background:var(--rowAlt);}
   tbody tr:nth-child(odd){background:var(--row);}
   tbody tr:hover{background:var(--rowHover);}
@@ -204,6 +205,7 @@
   <button class="btn" id="typeBtn">Cerca per Tipo ▾</button>
   <button class="btn" id="classBtn">Cerca per Classe ▾</button>
   <button class="btn" id="countryBtn">Cerca per Nazione ▾</button>
+  <button class="btn" id="yearBtn">Cerca per Anno ▾</button>
   <button class="btn secondary" id="resetBtn">Azzera filtri</button>
 </div>
 
@@ -220,6 +222,7 @@
         <tr id="headRow">
           <th data-key="make">Marca</th>
           <th data-key="name">Nome</th>
+          <th data-key="year">Anno</th>
           <th data-key="type">Tipo</th>
           <th data-key="cls">Classe</th>
           <th data-key="country">Nazione</th>
@@ -889,10 +892,14 @@ const cars = RAW.split('\n')
   .map((line, i) => {
     const f = line.split('|');
     const c = parseClass(f[3] || '');
+    const fullName = f[1]||'';
+    const ym = fullName.match(/^((?:19|20)\d\d|2554)\s+/);   // anno davanti al nome
+    const year = ym ? ym[1] : '';
+    const nameClean = ym ? fullName.slice(ym[0].length) : fullName;
     return {
       id: i,
-      key: (f[0]||'') + '|' + (f[1]||''),
-      make: f[0]||'', name: f[1]||'', type: f[2]||'',
+      key: (f[0]||'') + '|' + fullName,
+      make: f[0]||'', name: fullName, nameClean: nameClean, year: year, type: f[2]||'',
       classFull: f[3]||'', pi: c.pi, cls: c.cls,
       country: f[4]||'', collection: f[5]||'', dlc: (f[6]||'').trim()
     };
@@ -1532,7 +1539,7 @@ function setPrice(car, which, val){
 }
 
 /* ======================= STATE ======================= */
-const COLS = ['make','name','type','cls','country','collection','dlc','price','priceDisc'];
+const COLS = ['make','name','year','type','cls','country','collection','dlc','price','priceDisc'];
 
 /* ===================== LINGUE (i18n) ===================== */
 const I18N = {
@@ -1545,13 +1552,14 @@ const I18N = {
     info:"Click su un'intestazione per ordinare",
     empty:'Nessuna auto trovata.',
     popupTitle:'Cerca per Marca', popupHint:'Clicca una marca per filtrare la tabella.',
-    typeBtn:'Cerca per Tipo ▾', classBtn:'Cerca per Classe ▾', countryBtn:'Cerca per Nazione ▾',
+    typeBtn:'Cerca per Tipo ▾', classBtn:'Cerca per Classe ▾', countryBtn:'Cerca per Nazione ▾', yearBtn:'Cerca per Anno ▾',
     pickTypeTitle:'Cerca per Tipo', pickTypeHint:'Clicca un tipo per filtrare la tabella.',
     pickClassTitle:'Cerca per Classe', pickClassHint:'Clicca una classe per filtrare la tabella.',
     pickCountryTitle:'Cerca per Nazione', pickCountryHint:'Clicca una nazione per filtrare la tabella.',
-    allMakes:'★ Tutte le marche', allTypes:'★ Tutti i tipi', allClasses:'★ Tutte le classi', allCountries:'★ Tutte le nazioni',
-    fMake:'Marca', fType:'Tipo', fClass:'Classe', fCountry:'Nazione', fInCol:'Ricerca in colonna', fSearch:'Ricerca',
-    cols:{make:'Marca',name:'Nome',type:'Tipo',cls:'Classe',country:'Nazione',collection:'Collezione',dlc:'DLC',price:'Prezzo',priceDisc:'Prezzo Scontato'},
+    pickYearTitle:'Cerca per Anno', pickYearHint:'Clicca una decade per filtrare la tabella.',
+    allMakes:'★ Tutte le marche', allTypes:'★ Tutti i tipi', allClasses:'★ Tutte le classi', allCountries:'★ Tutte le nazioni', allYears:'★ Tutti gli anni',
+    fMake:'Marca', fType:'Tipo', fClass:'Classe', fCountry:'Nazione', fYear:'Anno', fInCol:'Ricerca in colonna', fSearch:'Ricerca',
+    cols:{make:'Marca',name:'Nome',year:'Anno',type:'Tipo',cls:'Classe',country:'Nazione',collection:'Collezione',dlc:'DLC',price:'Prezzo',priceDisc:'Prezzo Scontato'},
     coll:{'collection journal':'Collezione Giornaliera','autoshow':'Autosalone','wheelspin':'Ruota della Fortuna','seasonal':'Stagionale'},
     types:{'Buggies':'Buggy','Classic Muscle':'Muscle Classiche','Classic Racers':'Auto Da Corsa Classiche','Classic Rally':'Rally Classico','Classic Sports Cars':'Auto Sportive Classiche','Cult Cars':'Auto Di Culto','Drift Cars':'Auto Da Derapata','Eclectic Domestics':'Domestiche Eclettiche','Extreme Track Toys':'Giocattoli Da Gara Estremi','GT Cars':'Auto GT','Hot Hatch':'Hot Hatch','Hypercars':'Hypercar','Modern Muscle':'Muscle Moderne','Modern Rally':'Rally Moderne','Modern Sports Cars':'Auto Sportive Moderne','Modern Super Saloons':'Super Berline Moderne','Modern Supercars':'Supercar Moderne','Offroad':'Fuoristrada',"Pickups & 4x4's":'Pickup e 4x4','Rally Monsters':'Mostri Del Rally','Rare Classics':'Classiche Rare','Retro Hot Hatch':'Hot Hatch Rétro','Retro Muscle':'Muscle Rétro','Retro Racers':'Auto da Corsa Rètro','Retro Rally':'Rally Rétro','Retro Sports Cars':'Auto Sportive Rétro','Retro Super Saloons':'Super Berline Rétro','Retro Supercars':'Supercar Rétro','Rods and Customs':'HotRod e Personalizzate','Sports Utility Heroes':'Sports Utility Heroes','Super GT':'Super GT','Super Hot Hatch':'Super Hot Hatch','Track Toys':'Giocattoli Da Gara',"UTV's":'UTV','Unlimited Buggies':'Buggy Unlimited','Unlimited Offroad':'Fuoristrada Unlimited','Utility Heroes':'Veicoli Commerciali'}
   },
@@ -1564,13 +1572,14 @@ const I18N = {
     info:'Click a header to sort',
     empty:'No cars found.',
     popupTitle:'Search by Make', popupHint:'Click a make to filter the table.',
-    typeBtn:'Search by Type ▾', classBtn:'Search by Class ▾', countryBtn:'Search by Country ▾',
+    typeBtn:'Search by Type ▾', classBtn:'Search by Class ▾', countryBtn:'Search by Country ▾', yearBtn:'Search by Year ▾',
     pickTypeTitle:'Search by Type', pickTypeHint:'Click a type to filter the table.',
     pickClassTitle:'Search by Class', pickClassHint:'Click a class to filter the table.',
     pickCountryTitle:'Search by Country', pickCountryHint:'Click a country to filter the table.',
-    allMakes:'★ All makes', allTypes:'★ All types', allClasses:'★ All classes', allCountries:'★ All countries',
-    fMake:'Make', fType:'Type', fClass:'Class', fCountry:'Country', fInCol:'Searching column', fSearch:'Search',
-    cols:{make:'Make',name:'Name',type:'Type',cls:'Class',country:'Country',collection:'Collection',dlc:'DLC',price:'Price',priceDisc:'Discounted Price'},
+    pickYearTitle:'Search by Year', pickYearHint:'Click a decade to filter the table.',
+    allMakes:'★ All makes', allTypes:'★ All types', allClasses:'★ All classes', allCountries:'★ All countries', allYears:'★ All years',
+    fMake:'Make', fType:'Type', fClass:'Class', fCountry:'Country', fYear:'Year', fInCol:'Searching column', fSearch:'Search',
+    cols:{make:'Make',name:'Name',year:'Year',type:'Type',cls:'Class',country:'Country',collection:'Collection',dlc:'DLC',price:'Price',priceDisc:'Discounted Price'},
     coll:{}, types:{}
   }
 };
@@ -1602,6 +1611,7 @@ let state = {
   type: null,        // filtro tipo attivo
   cls: null,         // filtro classe attivo
   country: null,     // filtro nazione attivo
+  decade: null,      // filtro decade attivo (anno iniziale, es. 1990)
   query: '',
   searchCol: null    // colonna auto-rilevata dalla ricerca
 };
@@ -1643,7 +1653,8 @@ function detectColumn(q){
 function carField(car, col){
   switch(col){
     case 'make': return car.make;
-    case 'name': return car.name;
+    case 'name': return car.nameClean;
+    case 'year': return car.year;
     case 'type': return typeDisplay(car);
     case 'cls': return car.classFull;
     case 'country': return car.country;
@@ -1670,6 +1681,12 @@ function compare(a, b){
   const k = state.sortKey, d = state.sortDir;
   let av, bv;
   if(k === 'cls'){ av=CLASS_ORDER[a.cls]||99; bv=CLASS_ORDER[b.cls]||99; if(av===bv){ av=a.pi; bv=b.pi; } }
+  else if(k === 'year'){
+    av = a.year ? +a.year : null; bv = b.year ? +b.year : null;
+    if(av==null && bv==null) return a.make.localeCompare(b.make);
+    if(av==null) return 1;
+    if(bv==null) return -1;
+  }
   else if(k === 'price' || k === 'priceDisc'){
     av = getPrice(a, k); bv = getPrice(b, k);
     // valori vuoti sempre in fondo
@@ -1692,6 +1709,7 @@ function render(){
   if(state.type) rows = rows.filter(c => c.type === state.type);
   if(state.cls) rows = rows.filter(c => c.cls === state.cls);
   if(state.country) rows = rows.filter(c => c.country === state.country);
+  if(state.decade != null) rows = rows.filter(c => c.year && +c.year >= state.decade && +c.year < state.decade+10);
   if(state.query){
     const col = state.searchCol;
     rows = rows.filter(c => matchesQuery(c, state.query, col));
@@ -1717,7 +1735,8 @@ function render(){
 
     tr.innerHTML =
       '<td class="col-make'+hl('make')+'"><b>'+esc(car.make)+'</b></td>'+
-      '<td class="col-name'+hl('name')+'">'+esc(car.name)+'</td>'+
+      '<td class="col-name'+hl('name')+'">'+esc(car.nameClean)+'</td>'+
+      '<td class="col-year'+hl('year')+'">'+(car.year?esc(car.year):'<span class="pi">—</span>')+'</td>'+
       '<td class="'+hl('type')+'">'+esc(typeDisplay(car))+'</td>'+
       '<td class="'+hl('cls')+'"><span class="cls"><span class="tag c'+clsClass(car.cls)+'">'+esc(car.cls)+'</span><span class="pi">'+car.pi+'</span></span></td>'+
       '<td class="'+hl('country')+'">'+esc(car.country)+'</td>'+
@@ -1740,6 +1759,7 @@ function render(){
   if(state.type) parts.push(I18N[lang].fType+': <b>'+esc(typeName(state.type))+'</b>');
   if(state.cls) parts.push(I18N[lang].fClass+': <b>'+esc(state.cls)+'</b>');
   if(state.country) parts.push(I18N[lang].fCountry+': <b>'+esc(state.country)+'</b>');
+  if(state.decade != null) parts.push(I18N[lang].fYear+': <b>'+decadeLabel(state.decade)+'</b>');
   if(state.query && state.searchCol) parts.push(I18N[lang].fInCol+': <b>'+I18N[lang].cols[state.searchCol]+'</b>');
   else if(state.query) parts.push(I18N[lang].fSearch+': <b>'+esc(state.query)+'</b>');
   af.innerHTML = parts.join(' • ');
@@ -1800,24 +1820,25 @@ clearEl.addEventListener('click', () => {
 
 // reset
 document.getElementById('resetBtn').addEventListener('click', () => {
-  state.brand=null; state.type=null; state.cls=null; state.country=null; state.query=''; state.searchCol=null;
+  state.brand=null; state.type=null; state.cls=null; state.country=null; state.decade=null; state.query=''; state.searchCol=null;
   searchEl.value=''; scopeEl.style.display='none'; clearEl.classList.remove('show');
   state.sortKey='make'; state.sortDir=1;
   render();
 });
 
-// popup di ricerca (Marca / Tipo / Classe / Nazione)
+// popup di ricerca (Marca / Tipo / Classe / Nazione / Anno)
 const overlay = document.getElementById('brandOverlay');
 const brandGrid = document.getElementById('brandGrid');
+function decadeLabel(d){ return String(d%100).padStart(2,'0')+"'"; }   // 1990 -> "90'", 2000 -> "00'"
 function buildPicker(kind){
   const T = I18N[lang];
-  const titles = {brand:T.popupTitle, type:T.pickTypeTitle, cls:T.pickClassTitle, country:T.pickCountryTitle};
-  const hints  = {brand:T.popupHint,  type:T.pickTypeHint,  cls:T.pickClassHint,  country:T.pickCountryHint};
-  const alls   = {brand:T.allMakes,   type:T.allTypes,      cls:T.allClasses,     country:T.allCountries};
+  const titles = {brand:T.popupTitle, type:T.pickTypeTitle, cls:T.pickClassTitle, country:T.pickCountryTitle, decade:T.pickYearTitle};
+  const hints  = {brand:T.popupHint,  type:T.pickTypeHint,  cls:T.pickClassHint,  country:T.pickCountryHint, decade:T.pickYearHint};
+  const alls   = {brand:T.allMakes,   type:T.allTypes,      cls:T.allClasses,     country:T.allCountries,    decade:T.allYears};
   document.getElementById('popupTitle').textContent = titles[kind];
   document.getElementById('popupHint').textContent  = hints[kind];
   brandGrid.innerHTML='';
-  const choose = key => { if(kind==='brand')state.brand=key; else if(kind==='type')state.type=key; else if(kind==='cls')state.cls=key; else state.country=key; overlay.classList.remove('open'); render(); };
+  const choose = key => { if(kind==='brand')state.brand=key; else if(kind==='type')state.type=key; else if(kind==='cls')state.cls=key; else if(kind==='country')state.country=key; else state.decade=key; overlay.classList.remove('open'); render(); };
   const all = document.createElement('div');
   all.className='brand-item all';
   all.innerHTML=alls[kind]+' <span class="cnt">'+cars.length+'</span>';
@@ -1833,6 +1854,9 @@ function buildPicker(kind){
   } else if(kind==='country'){
     const c={}; cars.forEach(x=>c[x.country]=(c[x.country]||0)+1);
     items = Object.keys(c).sort((a,b)=>a.localeCompare(b)).map(k=>({key:k,label:esc(k),cnt:c[k]}));
+  } else if(kind==='decade'){
+    const c={}; cars.forEach(x=>{ if(!x.year)return; const dec=Math.floor(+x.year/10)*10; if(dec>=1930&&dec<=2020) c[dec]=(c[dec]||0)+1; });
+    items = Object.keys(c).map(Number).sort((a,b)=>a-b).map(k=>({key:k,label:decadeLabel(k),cnt:c[k]}));
   } else {
     const order=['D','C','B','A','S1','S2','R','X']; const c={}; cars.forEach(x=>c[x.cls]=(c[x.cls]||0)+1);
     items = order.filter(k=>c[k]).map(k=>({key:k,label:'<span class="tag c'+clsClass(k)+'">'+k+'</span>',cnt:c[k]}));
@@ -1847,6 +1871,7 @@ function buildPicker(kind){
 document.getElementById('brandBtn').addEventListener('click', ()=>{ buildPicker('brand'); overlay.classList.add('open'); });
 document.getElementById('typeBtn').addEventListener('click', ()=>{ buildPicker('type'); overlay.classList.add('open'); });
 document.getElementById('countryBtn').addEventListener('click', ()=>{ buildPicker('country'); overlay.classList.add('open'); });
+document.getElementById('yearBtn').addEventListener('click', ()=>{ buildPicker('decade'); overlay.classList.add('open'); });
 document.getElementById('classBtn').addEventListener('click', ()=>{ buildPicker('cls'); overlay.classList.add('open'); });
 document.getElementById('brandClose').addEventListener('click', ()=> overlay.classList.remove('open'));
 overlay.addEventListener('click', e => { if(e.target===overlay) overlay.classList.remove('open'); });
@@ -1883,6 +1908,7 @@ function applyLang(l){
   document.getElementById('typeBtn').textContent = T.typeBtn;
   document.getElementById('classBtn').textContent = T.classBtn;
   document.getElementById('countryBtn').textContent = T.countryBtn;
+  document.getElementById('yearBtn').textContent = T.yearBtn;
   document.getElementById('resetBtn').textContent = T.reset;
   document.getElementById('metaInfo').textContent = T.info;
   emptyMsg.textContent = T.empty;

@@ -1963,7 +1963,8 @@ function buildPicker(kind){
     items = Object.keys(c).map(Number).sort((a,b)=>a-b).map(k=>({key:k,label:decadeLabel(k),cnt:c[k]}));
   } else {
     const order=['D','C','B','A','S1','S2','R','X']; const c={}; cars.forEach(x=>c[x.cls]=(c[x.cls]||0)+1);
-    items = order.filter(k=>c[k]).map(k=>({key:k,label:'<span class="tag c'+clsClass(k)+'">'+k+'</span>',cnt:c[k]}));
+    // X sempre presente anche senza auto (classe massima, solo coi potenziamenti)
+    items = order.filter(k=>c[k]||k==='X').map(k=>({key:k,label:'<span class="tag c'+clsClass(k)+'">'+k+'</span>',cnt:c[k]||0}));
   }
   items.forEach(it=>{
     const d=document.createElement('div'); d.className='brand-item';

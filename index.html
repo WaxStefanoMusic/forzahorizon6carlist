@@ -268,7 +268,7 @@
 
 <script>
 /* ======================= DATA =======================
-   Fonte cataloghi: forza.net/fh6cars (aggiornato 19 May 2026).
+   Fonte cataloghi: forza.net/fh6cars (aggiornato 13 Aug 2026 - Series 4 + Car Pass).
    Formato riga: Marca|Nome|Tipo|Classe(PI + lettera)|Nazione|Collezione|DLC
    I prezzi NON sono disponibili nei file del gioco in forma leggibile,
    quindi le colonne Prezzo / Prezzo Scontato sono vuote e modificabili a mano. */
@@ -891,6 +891,24 @@ const RAW = String.raw`
 616|Wuling|2013 Wuling Sunshine S Forza Edition|Track Toys|800 S1|China|Wheelspin, Seasonal|
 617|Wuling|2022 Wuling Hongguang Mini EV|Hot Hatch|100 D|China|Autoshow, Wheelspin|
 618|Zenvo|2019 Zenvo TSR-S|Hypercars|906 R|Denmark|Autoshow, Wheelspin|
+619|Abarth|2017 Abarth 124 Spider|Modern Sports Cars|450 C|Italy|Seasonal|
+620|Alfa Romeo|1968 Alfa Romeo Autodelta Tipo 33/2 Daytona|Classic Racers|696 A|Italy|Autoshow DLC|Car Pass
+621|Aston Martin|2003 Aston Martin DB7 GT|Retro Sports Cars|566 B|UK|Autoshow DLC|Car Pass
+622|Chevrolet|2024 Chevrolet Camaro ZL1|Modern Muscle|718 S1|USA|Seasonal|
+623|De Tomaso|1984 De Tomaso Pantera GT5|Retro Supercars|562 B|Italy|Seasonal|
+624|Exomotive|2018 Exomotive Exocet Sport V8 XP-5|Track Toys|841 S2|USA|Seasonal|
+625|Ford|1957 Ford Thunderbird|Rods and Customs|332 D|USA|Autoshow DLC|Car Pass
+626|Honda|1972 Honda Z GT|Eclectic Domestics|100 D|Japan|Autoshow DLC|Car Pass
+627|Honda|1970 Honda N600|Eclectic Domestics|100 D|Japan|Seasonal|
+628|Lamborghini|2022 Lamborghini Huracán EVO Spyder|Modern Supercars|757 S1|Italy|Seasonal|
+629|Lamborghini|2024 Lamborghini Temerario|Hypercars|801 S2|Italy|Seasonal|
+630|Lancia|1982 Lancia 037 Stradale|Retro Rally|555 B|Italy|Seasonal|
+631|Mitsubishi|1988 Mitsubishi Starion ESI-R|Retro Sports Cars|446 C|Japan|Seasonal|
+632|Nissan|1972 Nissan Patrol|Offroad|157 D|Japan|Autoshow DLC|Car Pass
+633|Nissan|1983 Nissan Skyline 2000 Turbo RS|Retro Sports Cars|414 C|Japan|Autoshow DLC|Car Pass
+634|Porsche|1987 Porsche #203 Porsche AG 961|Retro Racers|840 S2|Germany|Autoshow DLC|Car Pass
+635|Toyota|1974 Toyota Celica GT|Classic Sports Cars|287 D|Japan|Seasonal|
+636|Toyota|2024 Toyota Prius Prime XSE Premium|Hot Hatch|472 C|Japan|Autoshow DLC|Car Pass
 `;
 
 /* ======================= PARSING ======================= */
@@ -1564,7 +1582,7 @@ const COLS = ['owned','make','name','year','type','cls','country','collection','
 /* ===================== LINGUE (i18n) ===================== */
 const I18N = {
   it: {
-    titleSub:'Lista Auto', updated:'Aggiornato', dateStr:'19 Maggio 2026',
+    titleSub:'Lista Auto', updated:'Aggiornato', dateStr:'13 Agosto 2026',
     searchPh:'Cerca auto, marca, tipo, classe, nazione, collezione, DLC…',
     brandBtn:'Cerca per Marca ▾', reset:'Azzera filtri',
     themeLight:'☀ Tema chiaro', themeDark:'🌙 Tema scuro',
@@ -1585,7 +1603,7 @@ const I18N = {
     types:{'Buggies':'Buggy','Classic Muscle':'Muscle Classiche','Classic Racers':'Auto Da Corsa Classiche','Classic Rally':'Rally Classico','Classic Sports Cars':'Auto Sportive Classiche','Cult Cars':'Auto Di Culto','Drift Cars':'Auto Da Derapata','Eclectic Domestics':'Domestiche Eclettiche','Extreme Track Toys':'Giocattoli Da Gara Estremi','GT Cars':'Auto GT','Hot Hatch':'Hot Hatch','Hypercars':'Hypercar','Modern Muscle':'Muscle Moderne','Modern Rally':'Rally Moderne','Modern Sports Cars':'Auto Sportive Moderne','Modern Super Saloons':'Super Berline Moderne','Modern Supercars':'Supercar Moderne','Offroad':'Fuoristrada',"Pickups & 4x4's":'Pickup e 4x4','Rally Monsters':'Mostri Del Rally','Rare Classics':'Classiche Rare','Retro Hot Hatch':'Hot Hatch Rétro','Retro Muscle':'Muscle Rétro','Retro Racers':'Auto da Corsa Rètro','Retro Rally':'Rally Rétro','Retro Sports Cars':'Auto Sportive Rétro','Retro Super Saloons':'Super Berline Rétro','Retro Supercars':'Supercar Rétro','Rods and Customs':'HotRod e Personalizzate','Sports Utility Heroes':'Sports Utility Heroes','Super GT':'Super GT','Super Hot Hatch':'Super Hot Hatch','Track Toys':'Giocattoli Da Gara',"UTV's":'UTV','Unlimited Buggies':'Buggy Unlimited','Unlimited Offroad':'Fuoristrada Unlimited','Utility Heroes':'Veicoli Commerciali'}
   },
   en: {
-    titleSub:'Car List', updated:'Updated', dateStr:'19 May 2026',
+    titleSub:'Car List', updated:'Updated', dateStr:'13 August 2026',
     searchPh:'Search car, make, type, class, country, collection, DLC…',
     brandBtn:'Search by Make ▾', reset:'Reset filters',
     themeLight:'☀ Light theme', themeDark:'🌙 Dark theme',

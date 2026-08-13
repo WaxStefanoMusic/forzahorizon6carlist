@@ -85,6 +85,13 @@
   .btn:hover{filter:brightness(1.1);}
   .btn.secondary{background:var(--panel2); color:var(--text); border:1px solid var(--border);}
   .btn.secondary:hover{border-color:var(--accent);}
+  /* pulsante piccolo usato nella riga info (Ultime Aggiunte) */
+  .btn.mini{
+    padding:3px 10px; font-size:12px; border-radius:20px;
+    background:var(--panel2); color:var(--accent2); border:1px solid var(--accent2);
+  }
+  .btn.mini:hover{background:var(--accent2); color:#fff;}
+  .upd-note{ color:var(--muted); font-size:11px; margin-left:8px; }
 
   .meta-line{
     max-width:1500px; margin:10px auto 0; padding:0 16px;
@@ -230,6 +237,7 @@
   <span id="ownedCount" class="owned-count"></span>
   <span id="activeFilter"></span>
   <span id="metaInfo"></span>
+  <button class="btn mini" id="addedBtn">✨ Ultime Aggiunte</button>
 </div>
 
 <div class="table-shell">
@@ -911,6 +919,20 @@ const RAW = String.raw`
 636|Toyota|2024 Toyota Prius Prime XSE Premium|Hot Hatch|472 C|Japan|Autoshow DLC|Car Pass
 `;
 
+/* ============ STORICO AGGIORNAMENTI (pulsante "Ultime Aggiunte") ============
+   Ogni voce copre gli ID (prima colonna di RAW) aggiunti in quella data.
+   PER UN NUOVO AGGIORNAMENTO: aggiungi una riga in fondo con
+   from = ultimo ID precedente + 1, to = ultimo ID nuovo. Niente altro da toccare. */
+const UPDATES = [
+  { date:'2026-05-19', from:1,   to:618, it:'19 Maggio 2026', en:'19 May 2026',    noteIt:'Lista iniziale (lancio)', noteEn:'Initial list (launch)' },
+  { date:'2026-08-13', from:619, to:636, it:'13 Agosto 2026', en:'13 August 2026', noteIt:'Series 4 + Car Pass',     noteEn:'Series 4 + Car Pass' }
+];
+function updateOf(pid){
+  const n = parseInt(pid,10);
+  for(let i=UPDATES.length-1; i>=0; i--){ if(n>=UPDATES[i].from && n<=UPDATES[i].to) return UPDATES[i]; }
+  return null;
+}
+
 /* ======================= PARSING ======================= */
 const CLASS_ORDER = { 'D':1, 'C':2, 'B':3, 'A':4, 'S1':5, 'S2':6, 'R':7, 'X':8 };
 const PRICE_KEY = 'fh6_prices_v1';
@@ -939,7 +961,8 @@ const cars = RAW.split('\n')
       key: (f[1]||'') + '|' + fullName,
       make: f[1]||'', name: fullName, nameClean: nameClean, year: year, type: f[3]||'',
       classFull: f[4]||'', pi: c.pi, cls: c.cls,
-      country: f[5]||'', collection: f[6]||'', dlc: (f[7]||'').trim()
+      country: f[5]||'', collection: f[6]||'', dlc: (f[7]||'').trim(),
+      added: (updateOf(f[0]||'')||{}).date || ''    // data in cui l'auto è entrata in lista
     };
   });
 
@@ -1591,6 +1614,9 @@ const I18N = {
     empty:'Nessuna auto trovata.',
     popupTitle:'Cerca per Marca', popupHint:'Clicca una marca per filtrare la tabella.',
     typeBtn:'Cerca per Tipo ▾', classBtn:'Cerca per Classe ▾', countryBtn:'Cerca per Nazione ▾', yearBtn:'Cerca per Decade ▾',
+    addedBtn:'✨ Ultime Aggiunte',
+    pickAddedTitle:'Ultime Aggiunte', pickAddedHint:"Scegli la data dell'aggiornamento: vedrai solo le auto entrate in lista in quella data, dalla più recente alla prima.",
+    allAdded:'★ Tutte le date', fAdded:'Aggiunte il',
     pickTypeTitle:'Cerca per Tipo', pickTypeHint:'Clicca un tipo per filtrare la tabella.',
     pickClassTitle:'Cerca per Classe', pickClassHint:'Clicca una classe per filtrare la tabella.',
     pickCountryTitle:'Cerca per Nazione', pickCountryHint:'Clicca una nazione per filtrare la tabella.',
@@ -1612,6 +1638,9 @@ const I18N = {
     empty:'No cars found.',
     popupTitle:'Search by Make', popupHint:'Click a make to filter the table.',
     typeBtn:'Search by Type ▾', classBtn:'Search by Class ▾', countryBtn:'Search by Country ▾', yearBtn:'Search by Decade ▾',
+    addedBtn:'✨ Latest Additions',
+    pickAddedTitle:'Latest Additions', pickAddedHint:'Pick an update date: you will see only the cars added on that date, newest first.',
+    allAdded:'★ All dates', fAdded:'Added on',
     pickTypeTitle:'Search by Type', pickTypeHint:'Click a type to filter the table.',
     pickClassTitle:'Search by Class', pickClassHint:'Click a class to filter the table.',
     pickCountryTitle:'Search by Country', pickCountryHint:'Click a country to filter the table.',
@@ -1672,6 +1701,7 @@ let state = {
   cls: null,         // filtro classe attivo
   country: null,     // filtro nazione attivo
   decade: null,      // filtro decade attivo (anno iniziale, es. 1990)
+  added: null,       // filtro "Ultime Aggiunte": data aggiornamento (es. '2026-08-13')
   query: '',
   searchCol: null    // colonna auto-rilevata dalla ricerca
 };
@@ -1757,7 +1787,8 @@ function compare(a, b){
     if(ay !== by) return by - ay;
     return a.nameClean.localeCompare(b.nameClean);
   }
-  if(k === 'owned'){ av = owned.has(a.pid)?1:0; bv = owned.has(b.pid)?1:0; }
+  if(k === 'added'){ av = parseInt(a.pid,10)||0; bv = parseInt(b.pid,10)||0; }   // ordine di aggiunta in lista
+  else if(k === 'owned'){ av = owned.has(a.pid)?1:0; bv = owned.has(b.pid)?1:0; }
   else if(k === 'cls'){ av=CLASS_ORDER[a.cls]||99; bv=CLASS_ORDER[b.cls]||99; if(av===bv){ av=a.pi; bv=b.pi; } }
   else if(k === 'year'){
     av = a.year ? +a.year : null; bv = b.year ? +b.year : null;
@@ -1788,6 +1819,7 @@ function render(){
   if(state.cls) rows = rows.filter(c => c.cls === state.cls);
   if(state.country) rows = rows.filter(c => c.country === state.country);
   if(state.decade != null) rows = rows.filter(c => c.year && +c.year >= state.decade && +c.year < state.decade+10);
+  if(state.added) rows = rows.filter(c => c.added === state.added);
   if(state.query){
     const terms = state.query.split(/\s+/).map(na).filter(Boolean);
     if(terms.length > 1){
@@ -1849,6 +1881,7 @@ function render(){
   if(state.cls) parts.push(I18N[lang].fClass+': <b>'+esc(state.cls)+'</b>');
   if(state.country) parts.push(I18N[lang].fCountry+': <b>'+esc(state.country)+'</b>');
   if(state.decade != null) parts.push(I18N[lang].fYear+': <b>'+decadeLabel(state.decade)+'</b>');
+  if(state.added){ const u=UPDATES.find(x=>x.date===state.added); parts.push(I18N[lang].fAdded+': <b>'+esc(u?(lang==='it'?u.it:u.en):state.added)+'</b>'); }
   if(state.query && state.searchCol) parts.push(I18N[lang].fInCol+': <b>'+I18N[lang].cols[state.searchCol]+'</b>');
   else if(state.query) parts.push(I18N[lang].fSearch+': <b>'+esc(state.query)+'</b>');
   af.innerHTML = parts.join(' • ');
@@ -1941,7 +1974,7 @@ clearEl.addEventListener('click', () => {
 
 // reset
 document.getElementById('resetBtn').addEventListener('click', () => {
-  state.brand=null; state.type=null; state.cls=null; state.country=null; state.decade=null; state.query=''; state.searchCol=null;
+  state.brand=null; state.type=null; state.cls=null; state.country=null; state.decade=null; state.added=null; state.query=''; state.searchCol=null;
   searchEl.value=''; scopeEl.style.display='none'; clearEl.classList.remove('show');
   state.sortKey='make'; state.sortDir=1;
   render();
@@ -1953,14 +1986,26 @@ const brandGrid = document.getElementById('brandGrid');
 function decadeLabel(d){ return String(d%100).padStart(2,'0')+"'"; }   // 1990 -> "90'", 2000 -> "00'"
 function buildPicker(kind){
   const T = I18N[lang];
-  const titles = {brand:T.popupTitle, type:T.pickTypeTitle, cls:T.pickClassTitle, country:T.pickCountryTitle, decade:T.pickYearTitle};
-  const hints  = {brand:T.popupHint,  type:T.pickTypeHint,  cls:T.pickClassHint,  country:T.pickCountryHint, decade:T.pickYearHint};
-  const alls   = {brand:T.allMakes,   type:T.allTypes,      cls:T.allClasses,     country:T.allCountries,    decade:T.allYears};
+  const titles = {brand:T.popupTitle, type:T.pickTypeTitle, cls:T.pickClassTitle, country:T.pickCountryTitle, decade:T.pickYearTitle, added:T.pickAddedTitle};
+  const hints  = {brand:T.popupHint,  type:T.pickTypeHint,  cls:T.pickClassHint,  country:T.pickCountryHint, decade:T.pickYearHint, added:T.pickAddedHint};
+  const alls   = {brand:T.allMakes,   type:T.allTypes,      cls:T.allClasses,     country:T.allCountries,    decade:T.allYears,     added:T.allAdded};
   document.getElementById('popupTitle').textContent = titles[kind];
   document.getElementById('popupHint').textContent  = hints[kind];
-  brandGrid.classList.toggle('flow', kind==='decade' || kind==='cls');
+  brandGrid.classList.toggle('flow', kind==='decade' || kind==='cls' || kind==='added');
   brandGrid.innerHTML='';
-  const choose = key => { if(kind==='brand')state.brand=key; else if(kind==='type')state.type=key; else if(kind==='cls')state.cls=key; else if(kind==='country')state.country=key; else state.decade=key; overlay.classList.remove('open'); render(); };
+  const choose = key => {
+    if(kind==='brand')state.brand=key;
+    else if(kind==='type')state.type=key;
+    else if(kind==='cls')state.cls=key;
+    else if(kind==='country')state.country=key;
+    else if(kind==='added'){
+      state.added=key;
+      // scelta una data: ordina dall'ultima aggiunta alla prima
+      if(key){ state.sortKey='added'; state.sortDir=-1; } else { state.sortKey='make'; state.sortDir=1; }
+    }
+    else state.decade=key;
+    overlay.classList.remove('open'); render();
+  };
   const all = document.createElement('div');
   all.className='brand-item all';
   all.innerHTML=alls[kind]+' <span class="cnt">'+cars.length+'</span>';
@@ -1976,6 +2021,13 @@ function buildPicker(kind){
   } else if(kind==='country'){
     const c={}; cars.forEach(x=>c[x.country]=(c[x.country]||0)+1);
     items = Object.keys(c).sort((a,b)=>a.localeCompare(b)).map(k=>({key:k,label:esc(k),cnt:c[k]}));
+  } else if(kind==='added'){
+    // dalla più recente alla più vecchia
+    items = UPDATES.slice().reverse().map(u=>({
+      key:u.date,
+      label:'<b>'+esc(lang==='it'?u.it:u.en)+'</b><span class="upd-note">'+esc(lang==='it'?u.noteIt:u.noteEn)+'</span>',
+      cnt:cars.filter(c=>c.added===u.date).length
+    }));
   } else if(kind==='decade'){
     const c={}; cars.forEach(x=>{ if(!x.year)return; const dec=Math.floor(+x.year/10)*10; if(dec>=1930&&dec<=2020) c[dec]=(c[dec]||0)+1; });
     items = Object.keys(c).map(Number).sort((a,b)=>a-b).map(k=>({key:k,label:decadeLabel(k),cnt:c[k]}));
@@ -1996,6 +2048,7 @@ document.getElementById('typeBtn').addEventListener('click', ()=>{ buildPicker('
 document.getElementById('countryBtn').addEventListener('click', ()=>{ buildPicker('country'); overlay.classList.add('open'); });
 document.getElementById('yearBtn').addEventListener('click', ()=>{ buildPicker('decade'); overlay.classList.add('open'); });
 document.getElementById('classBtn').addEventListener('click', ()=>{ buildPicker('cls'); overlay.classList.add('open'); });
+document.getElementById('addedBtn').addEventListener('click', ()=>{ buildPicker('added'); overlay.classList.add('open'); });
 document.getElementById('brandClose').addEventListener('click', ()=> overlay.classList.remove('open'));
 overlay.addEventListener('click', e => { if(e.target===overlay) overlay.classList.remove('open'); });
 document.addEventListener('keydown', e => { if(e.key==='Escape') overlay.classList.remove('open'); });
@@ -2034,6 +2087,7 @@ function applyLang(l){
   document.getElementById('yearBtn').textContent = T.yearBtn;
   document.getElementById('resetBtn').textContent = T.reset;
   document.getElementById('metaInfo').textContent = T.info;
+  document.getElementById('addedBtn').textContent = T.addedBtn;
   emptyMsg.textContent = T.empty;
   document.getElementById('popupTitle').textContent = T.popupTitle;
   document.getElementById('popupHint').textContent = T.popupHint;

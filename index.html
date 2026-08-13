@@ -87,15 +87,17 @@
   .btn.secondary:hover{border-color:var(--accent);}
   /* pulsante piccolo usato nella riga info (Ultime Aggiunte) */
   .btn.mini{
-    padding:3px 10px; font-size:12px; border-radius:20px;
+    padding:3px 10px; font-size:12.5px; line-height:1.25; border-radius:20px;
     background:var(--panel2); color:var(--accent2); border:1px solid var(--accent2);
+    font-family:inherit;
   }
   .btn.mini:hover{background:var(--accent2); color:#fff;}
   .upd-note{ color:var(--muted); font-size:11px; margin-left:8px; }
 
   .meta-line{
     max-width:1500px; margin:10px auto 0; padding:0 16px;
-    color:var(--muted); font-size:12.5px; display:flex; gap:14px; flex-wrap:wrap; justify-content:center;
+    color:var(--muted); font-size:12.5px; display:flex; gap:14px; flex-wrap:wrap;
+    justify-content:center; align-items:center;   /* testo e pulsante sulla stessa linea */
   }
   .meta-line b{color:var(--text);}
 

@@ -982,10 +982,12 @@ const DEFAULT_PRICES = {
   "Alfa Romeo|1965 Alfa Romeo Giulia Sprint GTA Stradale": {price: 343000, priceDisc: 325850},
   "Alfa Romeo|1965 Alfa Romeo Giulia TZ2": {price: 1200000},
   "Alfa Romeo|1968 Alfa Romeo 33 Stradale": {price: 3500000, priceDisc: 3325000},
+  "Alfa Romeo|1990 Alfa Romeo SE 048SP": {price: 1000000, priceDisc: 950000},
   "Alfa Romeo|1992 Alfa Romeo 155 Q4": {price: 30000, priceDisc: 28500},
   "Alfa Romeo|2007 Alfa Romeo 8C Competizione": {price: 312000, priceDisc: 296400},
   "Alfa Romeo|2014 Alfa Romeo 4C": {price: 73000, priceDisc: 69350},
   "Alfa Romeo|2017 Alfa Romeo Giulia Quadrifoglio": {price: 45000, priceDisc: 42750},
+  "Alfa Romeo|2021 Alfa Romeo Giulia GTAm": {price: 225000, priceDisc: 213750},
   "Alumicraft|2015 Alumicraft Class 10 Race Car": {price: 45000, priceDisc: 42750},
   "Alumicraft|2021 Alumicraft #122 Class 1 Buggy": {price: 160000, priceDisc: 152000},
   "Alumicraft|2022 Alumicraft #6165 Trick Truck": {price: 300000, priceDisc: 285000},
@@ -1025,6 +1027,7 @@ const DEFAULT_PRICES = {
   "Audi|2021 Audi RS 6 Avant": {price: 83000, priceDisc: 78850},
   "Audi|2021 Audi RS 7 Sportback": {price: 80000, priceDisc: 76000},
   "Audi|2021 Audi RS e-tron GT": {price: 95000, priceDisc: 90250},
+  "Audi|2023 Audi R8 Coupé V10 GT RWD": {price: 250000, priceDisc: 237500},
   "Austin-Healey|1965 Austin-Healey 3000 MkIII": {price: 75000, priceDisc: 71250},
   "Autozam|1993 Autozam AZ-1": {price: 38000, priceDisc: 36100},
   "BAC|2014 BAC Mono": {price: 196000, priceDisc: 186200},
@@ -1579,7 +1582,12 @@ const DEFAULT_PRICES = {
   "Wuling|2013 Wuling Sunshine S": {price: 2000, priceDisc: 1900},
   "Wuling|2013 Wuling Sunshine S Forza Edition": {price: 500000},
   "Wuling|2022 Wuling Hongguang Mini EV": {price: 5000, priceDisc: 4750},
-  "Zenvo|2019 Zenvo TSR-S": {price: 1200000, priceDisc: 1140000}
+  "Zenvo|2019 Zenvo TSR-S": {price: 1200000, priceDisc: 1140000},
+  "Aston Martin|2003 Aston Martin DB7 GT": {price: 80000, priceDisc: 76000},
+  "Honda|1972 Honda Z GT": {price: 15000, priceDisc: 14250},
+  "Nissan|1972 Nissan Patrol": {price: 20000, priceDisc: 19000},
+  "Porsche|1987 Porsche #203 Porsche AG 961": {price: 520000, priceDisc: 494000},
+  "Toyota|2024 Toyota Prius Prime XSE Premium": {price: 40000, priceDisc: 38000}
 };
 
 /* prezzi salvati a mano nel browser (hanno priorità sui default incorporati) */
@@ -2010,7 +2018,7 @@ function buildPicker(kind){
   };
   const all = document.createElement('div');
   all.className='brand-item all';
-  all.innerHTML=alls[kind]+' <span class="cnt">'+cars.length+'</span>';
+  all.innerHTML=alls[kind]+(kind==='added'?':':'')+' <span class="cnt">'+cars.length+'</span>';
   all.addEventListener('click', ()=>choose(null));
   brandGrid.appendChild(all);
   let items=[];
@@ -2027,7 +2035,7 @@ function buildPicker(kind){
     // dalla più recente alla più vecchia
     items = UPDATES.slice().reverse().map(u=>({
       key:u.date,
-      label:'<b>'+esc(lang==='it'?u.it:u.en)+'</b><span class="upd-note">'+esc(lang==='it'?u.noteIt:u.noteEn)+'</span>',
+      label:'<b>'+esc(lang==='it'?u.it:u.en)+'</b><span class="upd-note">'+esc(lang==='it'?u.noteIt:u.noteEn)+':</span>',
       cnt:cars.filter(c=>c.added===u.date).length
     }));
   } else if(kind==='decade'){

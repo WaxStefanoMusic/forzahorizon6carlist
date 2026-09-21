@@ -278,7 +278,7 @@
 
 <script>
 /* ======================= DATA =======================
-   Fonte cataloghi: forza.net/fh6cars (aggiornato 13 Aug 2026 - Series 4 + Car Pass).
+   Fonte cataloghi: forza.net/fh6cars (aggiornato 8 September 2026 - Series 5 + Car Pass).
    Formato riga: Marca|Nome|Tipo|Classe(PI + lettera)|Nazione|Collezione|DLC
    I prezzi NON sono disponibili nei file del gioco in forma leggibile,
    quindi le colonne Prezzo / Prezzo Scontato sono vuote e modificabili a mano. */
@@ -919,6 +919,17 @@ const RAW = String.raw`
 634|Porsche|1987 Porsche #203 Porsche AG 961|Retro Racers|840 S2|Germany|Autoshow DLC|Car Pass
 635|Toyota|1974 Toyota Celica GT|Classic Sports Cars|287 D|Japan|Seasonal|
 636|Toyota|2024 Toyota Prius Prime XSE Premium|Hot Hatch|472 C|Japan|Autoshow DLC|Car Pass
+637|Bentley|2025 Bentley Continental GT Speed|Super GT|699 A|UK|Seasonal|
+638|Dodge|2023 Dodge Challenger SRT Demon 170|Modern Muscle|683 A|USA|Autoshow DLC|Car Pass
+639|Ginetta|2019 Ginetta G40 Junior|Track Toys|560 B|UK|Seasonal|
+640|Jaguar|1990 Jaguar XJ-S|Cult Cars|491 C|UK|Autoshow|
+641|Jaguar|1990 Jaguar XJ-S Forza Edition|Drift Cars|750 S1|UK|Collection Journal|
+642|Jaguar|2015 Jaguar XKR-S GT|Track Toys|671 A|UK|Seasonal|
+643|Lotus|2002 Lotus Esprit V8|Retro Supercars|619 A|UK|Seasonal|
+644|McLaren|2025 McLaren W1|Hypercars|918 R|UK|Autoshow DLC|Car Pass
+645|Porsche|1987 Porsche Carrera Coupe 'Luftauto 002'|Rally Monsters|561 B|Germany|Autoshow DLC|Car Pass
+646|Renault|1998 Renault Sport Spider|Retro Sports Cars|508 B|France|Autoshow DLC|Car Pass
+647|Vauxhall|2006 Vauxhall Astra VXR|Super Hot Hatch|512 B|UK|Seasonal|
 `;
 
 /* ============ STORICO AGGIORNAMENTI (pulsante "Ultime Aggiunte") ============
@@ -926,8 +937,9 @@ const RAW = String.raw`
    PER UN NUOVO AGGIORNAMENTO: aggiungi una riga in fondo con
    from = ultimo ID precedente + 1, to = ultimo ID nuovo. Niente altro da toccare. */
 const UPDATES = [
-  { date:'2026-05-19', from:1,   to:618, it:'19 Maggio 2026', en:'19 May 2026',    noteIt:'Lista iniziale (lancio)', noteEn:'Initial list (launch)' },
-  { date:'2026-08-13', from:619, to:636, it:'13 Agosto 2026', en:'13 August 2026', noteIt:'Series 4 + Car Pass',     noteEn:'Series 4 + Car Pass' }
+  { date:'2026-05-19', from:1, to:618, it:'19 Maggio 2026', en:'19 May 2026', noteIt:'Lista iniziale (lancio)', noteEn:'Initial list (launch)' },
+  { date:'2026-08-13', from:619, to:636, it:'13 Agosto 2026', en:'13 August 2026', noteIt:'Series 4 + Car Pass', noteEn:'Series 4 + Car Pass' },
+  { date:'2026-09-08', from:637, to:647, it:'8 Settembre 2026', en:'8 September 2026', noteIt:'Series 5 + Car Pass', noteEn:'Series 5 + Car Pass' }
 ];
 function updateOf(pid){
   const n = parseInt(pid,10);
@@ -1615,7 +1627,7 @@ const COLS = ['owned','make','name','year','type','cls','country','collection','
 /* ===================== LINGUE (i18n) ===================== */
 const I18N = {
   it: {
-    titleSub:'Lista Auto', updated:'Aggiornato', dateStr:'13 Agosto 2026',
+    titleSub:'Lista Auto', updated:'Aggiornato', dateStr:'8 Settembre 2026',
     searchPh:'Cerca auto, marca, tipo, classe, nazione, collezione, DLC…',
     brandBtn:'Cerca per Marca ▾', reset:'Azzera filtri',
     themeLight:'☀ Tema chiaro', themeDark:'🌙 Tema scuro',
@@ -1639,7 +1651,7 @@ const I18N = {
     types:{'Buggies':'Buggy','Classic Muscle':'Muscle Classiche','Classic Racers':'Auto Da Corsa Classiche','Classic Rally':'Rally Classico','Classic Sports Cars':'Auto Sportive Classiche','Cult Cars':'Auto Di Culto','Drift Cars':'Auto Da Derapata','Eclectic Domestics':'Domestiche Eclettiche','Extreme Track Toys':'Giocattoli Da Gara Estremi','GT Cars':'Auto GT','Hot Hatch':'Hot Hatch','Hypercars':'Hypercar','Modern Muscle':'Muscle Moderne','Modern Rally':'Rally Moderne','Modern Sports Cars':'Auto Sportive Moderne','Modern Super Saloons':'Super Berline Moderne','Modern Supercars':'Supercar Moderne','Offroad':'Fuoristrada',"Pickups & 4x4's":'Pickup e 4x4','Rally Monsters':'Mostri Del Rally','Rare Classics':'Classiche Rare','Retro Hot Hatch':'Hot Hatch Rétro','Retro Muscle':'Muscle Rétro','Retro Racers':'Auto da Corsa Rètro','Retro Rally':'Rally Rétro','Retro Sports Cars':'Auto Sportive Rétro','Retro Super Saloons':'Super Berline Rétro','Retro Supercars':'Supercar Rétro','Rods and Customs':'HotRod e Personalizzate','Sports Utility Heroes':'Sports Utility Heroes','Super GT':'Super GT','Super Hot Hatch':'Super Hot Hatch','Track Toys':'Giocattoli Da Gara',"UTV's":'UTV','Unlimited Buggies':'Buggy Unlimited','Unlimited Offroad':'Fuoristrada Unlimited','Utility Heroes':'Veicoli Commerciali'}
   },
   en: {
-    titleSub:'Car List', updated:'Updated', dateStr:'13 August 2026',
+    titleSub:'Car List', updated:'Updated', dateStr:'8 September 2026',
     searchPh:'Search car, make, type, class, country, collection, DLC…',
     brandBtn:'Search by Make ▾', reset:'Reset filters',
     themeLight:'☀ Light theme', themeDark:'🌙 Dark theme',

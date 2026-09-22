@@ -2044,8 +2044,8 @@ function buildPicker(kind){
     const c={}; cars.forEach(x=>c[x.country]=(c[x.country]||0)+1);
     items = Object.keys(c).sort((a,b)=>a.localeCompare(b)).map(k=>({key:k,label:esc(k),cnt:c[k]}));
   } else if(kind==='added'){
-    // dalla più recente alla più vecchia
-    items = UPDATES.slice().reverse().map(u=>({
+    // dalla prima alla più recente
+    items = UPDATES.slice().map(u=>({
       key:u.date,
       label:'<b>'+esc(lang==='it'?u.it:u.en)+'</b><span class="upd-note">'+esc(lang==='it'?u.noteIt:u.noteEn)+':</span>',
       cnt:cars.filter(c=>c.added===u.date).length
